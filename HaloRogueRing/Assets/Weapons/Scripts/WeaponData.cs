@@ -1,21 +1,20 @@
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Halo/WeaponData")]
+[CreateAssetMenu(fileName = "New Weapon Data", menuName = "Weapons/WeaponData")]
 public class WeaponData : ScriptableObject
 {
+    [Header("General")]
     public string weaponName;
 
-    public bool usesBatttery;
+    [Header("Combat")]
+    public float damage;
+    public float range;
 
+    [Header("Ammo")]
     public int magazineSize;
     public int maxReserveAmmo;
 
-    public float maxBattery = 100f;
-
-    public float fireRate;
-    public float damage;
-
-    public GameObject worldPrefab;
-    public GameObject viewModelPrefab;
+    [Header("Fire")]
+    public float firerate;
 }
 

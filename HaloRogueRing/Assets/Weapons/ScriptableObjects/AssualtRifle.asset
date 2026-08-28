@@ -13,11 +13,8 @@ MonoBehaviour:
   m_Name: AssualtRifle
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
   weaponName: AR
-  usesBatttery: 0
+  damage: 10
+  range: 100
   magazineSize: 60
   maxReserveAmmo: 600
-  maxBattery: 100
-  fireRate: 900
-  damage: 10
-  worldPrefab: {fileID: 0}
-  viewModelPrefab: {fileID: 0}
+  firerate: 15

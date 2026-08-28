@@ -16,7 +16,7 @@ public class WeaponInstance
         currentMagazine = weapon.magazineSize;
         reserveAmmo = weapon.maxReserveAmmo;
 
-        battery = weapon.maxBattery;
+
     }
 }
 
