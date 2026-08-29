@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 91afdd3a97fecc546b5f89d3b3935482, type: 3}
-  m_Name: AssualtRifle
+  m_Name: Pistol
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: AR
-  damage: 10
+  weaponName: Pistol
+  damage: 25
   range: 100
-  magazineSize: 60
-  maxReserveAmmo: 600
-  firerate: 15
-  worldPrefab: {fileID: 2013596871984400154, guid: a5cf5476a79efa041ae6abfa48b8ccc7, type: 3}
+  magazineSize: 12
+  maxReserveAmmo: 120
+  firerate: 4
+  worldPrefab: {fileID: 7051384730802265110, guid: 9397969240d746749864d9b727dd92c5, type: 3}

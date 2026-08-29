@@ -5,15 +5,19 @@ public class PlayerWeaponPickup : MonoBehaviour
     [SerializeField] private Transform weaponHolder;
     [SerializeField] private Camera playerCamera;
     private WeaponPickup nearbyWeapon;
+    private WeaponInventory inventory;
 
     private InputAction interactAction;
     private InputAction shootAction;
     private InputAction reloadAction;
+    private InputAction swapWAction;
     private void Awake()
     {
         interactAction = GetComponent<PlayerInput>().actions["Interact"];
         shootAction = GetComponent<PlayerInput>().actions["Shoot"];
         reloadAction = GetComponent<PlayerInput>().actions["Reload"];
+        swapWAction = GetComponent<PlayerInput>().actions["SwitchW"];
+        inventory = GetComponent<WeaponInventory>();
     }
 
     private void OnEnable()
@@ -21,16 +25,22 @@ public class PlayerWeaponPickup : MonoBehaviour
         interactAction.Enable();
         shootAction.Enable();
         reloadAction.Enable();
+        swapWAction.Enable();
     }
     private void OnDisable()
     {
         interactAction.Disable();
         shootAction.Disable();
         reloadAction.Disable();
+        swapWAction.Disable();
     }
 
     private void Update()
     {
+        if (swapWAction.WasPressedThisFrame())
+        {
+            inventory.SwapWeapons();
+        }
         if (interactAction.WasPressedThisFrame())
         {
             TryPickupWeapon();
@@ -49,17 +59,17 @@ public class PlayerWeaponPickup : MonoBehaviour
 
     private void TryReload()
     {
-        AssaultRifle rifle = weaponHolder.GetComponentInChildren<AssaultRifle>();
-        if (rifle == null)
+        Weapon weapon = weaponHolder.GetComponentInChildren<Weapon>();
+        if (weapon == null)
             return;
-        rifle.Reload();
+        weapon.Reload();
     }
     private void TryShoot()
     {
-        AssaultRifle rifle = weaponHolder.GetComponentInChildren<AssaultRifle>();
-        if (rifle == null)
+        Weapon weapon = weaponHolder.GetComponentInChildren<Weapon>();
+        if (weapon == null)
             return;
-        rifle.Fire();
+        weapon.Fire();
     }
 
     private void TryPickupWeapon()
@@ -67,18 +77,42 @@ public class PlayerWeaponPickup : MonoBehaviour
         if (nearbyWeapon == null)
             return;
 
-        GameObject weapon = Instantiate(
-            nearbyWeapon.equippedPrefab,
-            weaponHolder);
+        GameObject weaponObject =
+    Instantiate(
+        nearbyWeapon.equippedPrefab,
+        weaponHolder);
 
-        AssaultRifle rifle = weapon.GetComponent<AssaultRifle>();
-        if (rifle != null)
+        weaponObject.transform.localPosition =
+            Vector3.zero;
+
+        weaponObject.transform.localRotation =
+            Quaternion.identity;
+
+        Weapon weaponComponent = weaponObject.GetComponent<Weapon>();
+        if (weaponComponent != null)
         {
-            rifle.SetCamera(playerCamera);
+            weaponComponent.SetCamera(playerCamera);
+
+            if (nearbyWeapon.HasStoredState())
+            {
+                weaponComponent.SetState(nearbyWeapon.GetWeaponState());
+            }
+            
         }
 
-        weapon.transform.localPosition = Vector3.zero;
-        weapon.transform.localRotation = Quaternion.identity;
+        
+
+        bool added =
+            inventory.AddWeapon(weaponObject);
+
+        if (!added)
+        {
+            Destroy(weaponObject);
+
+            Debug.Log("Inventory Full");
+
+            return;
+        }
 
         Destroy(nearbyWeapon.gameObject);
 

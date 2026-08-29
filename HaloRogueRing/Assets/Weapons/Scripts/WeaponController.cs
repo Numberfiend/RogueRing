@@ -12,9 +12,6 @@ public class WeaponController : MonoBehaviour
 
     public void OnSwapWeapon(InputAction.CallbackContext context)
     {
-        if (context.performed)
-        {
-            inventory.SwapWeapon();
-        }
+       
     }
 }

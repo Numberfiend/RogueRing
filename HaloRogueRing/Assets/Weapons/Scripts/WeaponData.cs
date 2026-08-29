@@ -16,5 +16,8 @@ public class WeaponData : ScriptableObject
 
     [Header("Fire")]
     public float firerate;
+
+    [Header("WorldPrefab")]
+    public GameObject worldPrefab;
 }
 
