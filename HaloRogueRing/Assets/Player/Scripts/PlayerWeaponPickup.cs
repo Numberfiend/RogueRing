@@ -46,11 +46,20 @@ public class PlayerWeaponPickup : MonoBehaviour
             TryPickupWeapon();
         }
 
-        if (shootAction.IsPressed()) 
+        if (shootAction.WasPressedThisFrame())
         {
-            TryShoot();
+           StartFire();
+        }
+        if (shootAction.IsPressed())
+        {
+            ContinueFire();
+        }
+        if (shootAction.WasReleasedThisFrame())
+        {
+            ReleaseFire();
         }
 
+       
         if (reloadAction.WasPressedThisFrame())
         {
             TryReload();
@@ -64,13 +73,32 @@ public class PlayerWeaponPickup : MonoBehaviour
             return;
         weapon.Reload();
     }
-    private void TryShoot()
+    /*private void TryShoot()
     {
         Weapon weapon = weaponHolder.GetComponentInChildren<Weapon>();
         if (weapon == null)
             return;
         weapon.Fire();
+    }*/
+    private void StartFire()
+    {
+        Weapon weapon = weaponHolder.GetComponentInChildren<Weapon>();
+        if (weapon == null) return;
+        weapon.StartFire();
     }
+    private void ContinueFire()
+    {
+        Weapon weapon = weaponHolder.GetComponentInChildren<Weapon>();
+        if (weapon == null) return;
+        weapon.ContinueFire();
+    }
+    private void ReleaseFire()
+    {
+        Weapon weapon = weaponHolder.GetComponentInChildren<Weapon>();
+        if (weapon == null) return;
+        weapon.ReleaseFire();
+    }
+
 
     private void TryPickupWeapon()
     {

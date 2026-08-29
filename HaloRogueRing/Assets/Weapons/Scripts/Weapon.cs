@@ -102,4 +102,17 @@ public class Weapon : MonoBehaviour
                   "Reserve: " +
                   state.reserveAmmo);
     }
+
+    public virtual void StartFire()
+    {
+
+    }
+    public virtual void ContinueFire()
+    {
+        Fire();
+    }
+    public virtual void ReleaseFire()
+    {
+
+    } 
 }
