@@ -15,6 +15,7 @@ public class Weapon : MonoBehaviour
         state = new WeaponState();
         state.currentAmmo = weaponData.magazineSize;
         state.reserveAmmo = weaponData.maxReserveAmmo;
+        state.batteryCharge = weaponData.maxBatteryCharge;
     }
 
     public void SetCamera(Camera camera)

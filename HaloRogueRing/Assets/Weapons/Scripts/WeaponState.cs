@@ -4,6 +4,7 @@ public class WeaponState
 {
     public int currentAmmo;
     public int reserveAmmo;
+    public float batteryCharge;
 
     public WeaponState()
     {
@@ -14,5 +15,6 @@ public class WeaponState
     {
         currentAmmo = other.currentAmmo;
         reserveAmmo = other.reserveAmmo;
+        batteryCharge = other.batteryCharge;
     }
 }
