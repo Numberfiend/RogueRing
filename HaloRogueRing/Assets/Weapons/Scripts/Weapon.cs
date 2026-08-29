@@ -36,24 +36,30 @@ public class Weapon : MonoBehaviour
         state = new WeaponState(newState);
     }
 
-    public virtual void Fire()
+    public virtual bool Fire()
     {
+        // Fire-rate check
         if (Time.time < nextFireTime)
-            return;
+            return false;
 
-        if(weaponData.ammoType == AmmoType.Magazine)
+        // Magazine weapon
+        if (weaponData.ammoType == AmmoType.Magazine)
         {
             if (state.currentAmmo <= 0)
-                return;
+                return false;
+
             state.currentAmmo--;
         }
+        // Battery weapon
         else
         {
             if (state.batteryCharge < weaponData.batteryCost)
-                return;
-            state.batteryCharge-=weaponData.batteryCost;
+                return false;
+
+            state.batteryCharge -= weaponData.batteryCost;
         }
 
+        // Debug ammo
         if (weaponData.ammoType == AmmoType.Magazine)
         {
             Debug.Log(
@@ -69,29 +75,12 @@ public class Weapon : MonoBehaviour
                 state.batteryCharge);
         }
 
-
+        // Set next allowed fire time
         nextFireTime =
-                Time.time +
-                (1f / weaponData.firerate);
-        Debug.Log("Ammo: " + state.currentAmmo);
-        if (playerCamera == null)
-            return;
+            Time.time +
+            (1f / weaponData.firerate);
 
-        if (Physics.Raycast(
-            playerCamera.transform.position,
-            playerCamera.transform.forward,
-            out RaycastHit hit,
-            weaponData.range))
-        {
-            TempEnemyHealth health =
-                hit.collider.GetComponent<TempEnemyHealth>();
-
-            if (health != null)
-            {
-                health.TakeDamage(
-                    weaponData.damage);
-            }
-        }
+        return true;
     }
     public virtual void Reload()
     {

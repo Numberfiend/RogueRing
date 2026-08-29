@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Pistol : Weapon
+public class Pistol : HitScanWeapon
 {
   
 }

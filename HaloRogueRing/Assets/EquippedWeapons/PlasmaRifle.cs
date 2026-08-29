@@ -1,5 +1,5 @@
 using UnityEngine;
 
-public class PlasmaRifle : Weapon
+public class PlasmaRifle : ProjectileWeapon
 {
 }

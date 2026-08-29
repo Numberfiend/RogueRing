@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlasmaPistol : Weapon
+public class PlasmaPistol : ProjectileWeapon
 {
 
 }
