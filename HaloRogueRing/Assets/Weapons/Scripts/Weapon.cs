@@ -41,14 +41,38 @@ public class Weapon : MonoBehaviour
         if (Time.time < nextFireTime)
             return;
 
-        if (state.currentAmmo <= 0)
-            return;
+        if(weaponData.ammoType == AmmoType.Magazine)
+        {
+            if (state.currentAmmo <= 0)
+                return;
+            state.currentAmmo--;
+        }
+        else
+        {
+            if (state.batteryCharge < weaponData.batteryCost)
+                return;
+            state.batteryCharge-=weaponData.batteryCost;
+        }
 
-        state.currentAmmo--;
+        if (weaponData.ammoType == AmmoType.Magazine)
+        {
+            Debug.Log(
+                weaponData.weaponName +
+                " Ammo: " +
+                state.currentAmmo);
+        }
+        else
+        {
+            Debug.Log(
+                weaponData.weaponName +
+                " Battery: " +
+                state.batteryCharge);
+        }
+
 
         nextFireTime =
-            Time.time +
-            (1f / weaponData.firerate);
+                Time.time +
+                (1f / weaponData.firerate);
         Debug.Log("Ammo: " + state.currentAmmo);
         if (playerCamera == null)
             return;

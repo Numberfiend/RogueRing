@@ -82,11 +82,11 @@ public class PlayerWeaponPickup : MonoBehaviour
         nearbyWeapon.equippedPrefab,
         weaponHolder);
 
-        weaponObject.transform.localPosition =
-            Vector3.zero;
+        //weaponObject.transform.localPosition =
+           // Vector3.zero;
 
-        weaponObject.transform.localRotation =
-            Quaternion.identity;
+       // weaponObject.transform.localRotation =
+           // Quaternion.identity;
 
         Weapon weaponComponent = weaponObject.GetComponent<Weapon>();
         if (weaponComponent != null)
