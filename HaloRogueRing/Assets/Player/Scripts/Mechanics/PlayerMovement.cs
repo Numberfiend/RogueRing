@@ -13,16 +13,21 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 playerVelocity;
     private Transform cameraTransform;
 
+    [SerializeField] private AssaultRifle assaultRifle;
+
     [Header("Movement")]
     [SerializeField] private float speed = 10f;
     [SerializeField] private float jump = 5f;
     [SerializeField] private float gravity = -9.81f;
 
     [SerializeField] private Transform cameraPivot;
-
     [SerializeField] private float lookSensitivity = 2f;
     [SerializeField] private float maxLookAngle = 80f;
 
+    [Header("Recoil")]
+    [SerializeField] private float recoilRecoverySpeed = 8f;
+    
+    private float recoil = 0f;;
     private float pitch = 0f;
 
     private void Start()
@@ -39,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-       
+
     }
     void Update()
     {
