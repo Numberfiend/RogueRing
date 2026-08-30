@@ -17,5 +17,8 @@ MonoBehaviour:
   range: 100
   magazineSize: 12
   maxReserveAmmo: 120
+  ammoType: 0
+  batteryCost: 0
   firerate: 4
-  worldPrefab: {fileID: 7051384730802265110, guid: 9397969240d746749864d9b727dd92c5, type: 3}
+  maxBatteryCharge: 0
+  worldPrefab: {fileID: 7899721382758693252, guid: bc49bed0e490a5043982b38cb55f0c7f, type: 3}

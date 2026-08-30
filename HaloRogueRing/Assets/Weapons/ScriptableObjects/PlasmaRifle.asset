@@ -21,4 +21,4 @@ MonoBehaviour:
   batteryCost: 0.5
   firerate: 7
   maxBatteryCharge: 100
-  worldPrefab: {fileID: 1497811976397611133, guid: 4d5ca04392078a648be7ec2fbb2a4f62, type: 3}
+  worldPrefab: {fileID: 2318393713549298299, guid: 30a427457d31cb848a3419c03fa37d7f, type: 3}
