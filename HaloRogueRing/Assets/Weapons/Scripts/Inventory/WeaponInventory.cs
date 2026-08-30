@@ -102,4 +102,10 @@ public class WeaponInventory : MonoBehaviour
 
         return worldWeapon;
     }
+    public Weapon GetCurrentWeapon()
+    {
+        if(currentSlot < 0) return null;
+        if(weaponSlots[currentSlot] == null) return null;
+        return weaponSlots[currentSlot].GetComponent<Weapon>();
+    }
 }

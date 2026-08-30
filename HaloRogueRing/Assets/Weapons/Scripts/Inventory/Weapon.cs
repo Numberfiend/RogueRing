@@ -4,9 +4,13 @@ public class Weapon : MonoBehaviour
 {
     [SerializeField] protected WeaponData weaponData;
 
+    protected float currentSpread;
+    
     protected WeaponState state;
 
     protected Camera playerCamera;
+
+    protected PlayerMovement playerMovement;
 
     protected float nextFireTime;
 
@@ -16,6 +20,7 @@ public class Weapon : MonoBehaviour
         state.currentAmmo = weaponData.magazineSize;
         state.reserveAmmo = weaponData.maxReserveAmmo;
         state.batteryCharge = weaponData.maxBatteryCharge;
+        currentSpread = weaponData.minSpread;
     }
 
     public void SetCamera(Camera camera)
@@ -34,6 +39,13 @@ public class Weapon : MonoBehaviour
     public void SetState(WeaponState newState)
     {
         state = new WeaponState(newState);
+    }
+
+    protected virtual void Update()
+    {
+        currentSpread = Mathf.MoveTowards(
+            currentSpread, weaponData.minSpread,
+            weaponData.spreadRecoverySpeed * Time.deltaTime);
     }
 
     public virtual bool Fire()
@@ -80,6 +92,14 @@ public class Weapon : MonoBehaviour
             Time.time +
             (1f / weaponData.firerate);
 
+        currentSpread += weaponData.spreadIncreasePerShot;
+
+        currentSpread = Mathf.Min(
+            currentSpread,
+            weaponData.maxSpread
+        );
+
+
         return true;
     }
     public virtual void Reload()
@@ -115,4 +135,5 @@ public class Weapon : MonoBehaviour
     {
 
     } 
+    
 }

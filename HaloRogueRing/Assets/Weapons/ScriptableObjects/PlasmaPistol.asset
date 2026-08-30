@@ -21,4 +21,8 @@ MonoBehaviour:
   batteryCost: 0.2
   firerate: 4
   maxBatteryCharge: 100
+  minSpread: 0
+  maxSpread: 0.001
+  spreadIncreasePerShot: 0.0002
+  spreadRecoverySpeed: 0.01
   worldPrefab: {fileID: 6715272557297943728, guid: e9657febbee30af4f8b3a7a0ca761b46, type: 3}

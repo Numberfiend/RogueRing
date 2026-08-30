@@ -12,8 +12,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector3 playerVelocity;
     private Transform cameraTransform;
-
-    [SerializeField] private AssaultRifle assaultRifle;
+    [SerializeField] private WeaponInventory weaponInventory;
 
     [Header("Movement")]
     [SerializeField] private float speed = 10f;
@@ -24,10 +23,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float lookSensitivity = 2f;
     [SerializeField] private float maxLookAngle = 80f;
 
-    [Header("Recoil")]
-    [SerializeField] private float recoilRecoverySpeed = 8f;
-    
-    private float recoil = 0f;;
     private float pitch = 0f;
 
     private void Start()
@@ -61,6 +56,8 @@ public class PlayerMovement : MonoBehaviour
         controller.Move(move * speed * Time.deltaTime);
     }
 
+    
+
     public void look()
     {
         Vector2 lookInput = lookAction.ReadValue<Vector2>();
@@ -68,9 +65,19 @@ public class PlayerMovement : MonoBehaviour
         transform.Rotate(Vector3.up * lookInput.x * lookSensitivity);
 
         pitch -= lookInput.y * lookSensitivity;
-        pitch = Mathf.Clamp(pitch, -maxLookAngle, maxLookAngle);
 
-        cameraPivot.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+        pitch = Mathf.Clamp(
+            pitch,
+            -maxLookAngle,
+            maxLookAngle
+        ); 
+
+        cameraPivot.localRotation =
+            Quaternion.Euler(
+                pitch,
+                0f,
+                0f
+            );
     }
 
     public void jumping()

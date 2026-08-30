@@ -43,6 +43,8 @@ public class HitScanWeapon : Weapon
 
     protected virtual Vector3 GetShotDirection()
     {
-        return playerCamera.transform.forward;
+        Vector3 direction = playerCamera.transform.forward;
+        direction += Random.insideUnitSphere * currentSpread;
+        return direction.normalized;
     }
 }
