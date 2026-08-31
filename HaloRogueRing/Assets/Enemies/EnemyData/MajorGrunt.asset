@@ -15,4 +15,6 @@ MonoBehaviour:
   enemyName: MajorGrunt
   maxHealth: 60
   maxShield: 0
-  startingWeapon: {fileID: 11400000, guid: 0464764512b096b49894e0e6df9946a1, type: 2}
+  availibleWeapons:
+  - {fileID: 11400000, guid: 0464764512b096b49894e0e6df9946a1, type: 2}
+  - {fileID: 11400000, guid: ebee9c07fbf018741975adb43b9727be, type: 2}

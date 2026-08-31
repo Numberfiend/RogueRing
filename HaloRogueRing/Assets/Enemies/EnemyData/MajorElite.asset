@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 53544a77315392448a8b2f255d0fbbb6, type: 3}
-  m_Name: MinorElite
+  m_Name: MajorElite
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  enemyName: MinorElite
+  enemyName: MajorElite
   maxHealth: 100
-  maxShield: 100
+  maxShield: 150
   availibleWeapons:
   - {fileID: 11400000, guid: 424251e98b50ff84eb54a9c8eb505f48, type: 2}
   - {fileID: 11400000, guid: ebee9c07fbf018741975adb43b9727be, type: 2}

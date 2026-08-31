@@ -37,6 +37,14 @@ public class PlasmaBolts : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log(
+            "Plasma bolt hit: " +
+            other.gameObject.name +
+            " | Faction: " +
+            faction +
+            " | Damage: " +
+            damage
+        );
         if (faction == Faction.Player)
         {
             EnemyHealth enemyHealth = other.GetComponent<EnemyHealth>();
@@ -47,7 +55,8 @@ public class PlasmaBolts : MonoBehaviour
         }
         else if(faction == Faction.Covenant)
         {
-            PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
+           
+            PlayerHealth playerHealth = other.GetComponentInParent<PlayerHealth>();
             if(playerHealth != null)
             {
                 playerHealth.TakeDamage(damage);

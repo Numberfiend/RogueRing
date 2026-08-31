@@ -10,5 +10,6 @@ public class EnemyData: ScriptableObject
     public float maxHealth;
     public float maxShield;
 
-    public WeaponData startingWeapon;
+    [Header("Weapons")]
+    public WeaponData[] availibleWeapons;
 }

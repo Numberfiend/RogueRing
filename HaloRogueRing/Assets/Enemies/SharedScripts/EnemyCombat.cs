@@ -1,73 +1,84 @@
 using UnityEngine;
 
-public class EnemyCombat : MonoBehaviour
+public abstract class EnemyCombat : MonoBehaviour
 {
-    [SerializeField] private EnemyData enemyData;
-    [SerializeField] private Transform firePoint;
-    [SerializeField] private GameObject projectilePrefab;
+    [Header("Enemy")]
+    [SerializeField] protected EnemyData enemyData;
 
-    [SerializeField] private float minDamage =5f;
-    [SerializeField] private float mediDamage =8f;
-    [SerializeField] private float maxDamage =10f;
+    [Header("Weapon Selection")]
+    [SerializeField] protected int activeWeaponIndex = 0;
 
-    private float nextFireTime;
+    protected WeaponData equippedWeapon;
+    protected Transform activeFirePoint;
 
-    private void Update()
+    protected float nextFireTime;
+
+    protected virtual void Start()
     {
-        if (enemyData == null) return;
-        if(enemyData.startingWeapon == null) return;
-        if(Time.time > nextFireTime)
+        SetActiveWeapon();
+        UpdateWeaponModel();
+    }
+
+    protected virtual void Update()
+    {
+        if (equippedWeapon == null)
+            return;
+
+        if (Time.time >= nextFireTime)
         {
             Fire();
         }
     }
-    private void Fire()
+
+    protected abstract void Fire();
+
+    protected abstract void UpdateWeaponModel();
+
+    protected void SetActiveWeapon()
     {
-        if(projectilePrefab == null)
+        if (enemyData == null)
         {
+            Debug.LogError(
+                gameObject.name +
+                " has no EnemyData assigned."
+            );
+
             return;
         }
-        if (firePoint == null) return;
 
-        float damage = GetWeaponDamage();
-        GameObject projectileObject = Instantiate(
-            projectilePrefab,
-            firePoint.position,
-            firePoint.rotation
-        );
-        PlasmaBolts projectile = projectileObject.GetComponent<PlasmaBolts>();
-
-        if (projectile != null)
+        if (enemyData.availibleWeapons == null ||
+            enemyData.availibleWeapons.Length == 0)
         {
-            projectile.Intialize(damage);
-            
-            projectile.SetFaction(Faction.Covenant);
+            Debug.LogError(
+                enemyData.enemyName +
+                " has no available weapons."
+            );
+
+            return;
         }
 
-        nextFireTime =
-            Time.time +
-            (1f / enemyData.startingWeapon.firerate);
+        activeWeaponIndex = Mathf.Clamp(
+            activeWeaponIndex,
+            0,
+            enemyData.availibleWeapons.Length - 1
+        );
+
+        equippedWeapon =
+            enemyData.availibleWeapons[activeWeaponIndex];
     }
+
+    protected void SetFirePoint(Transform firePoint)
+    {
+        activeFirePoint = firePoint;
+    }
+
     public WeaponData GetWeapon()
     {
-        return enemyData.startingWeapon;
+        return equippedWeapon;
     }
 
-    private float GetWeaponDamage()
+    public Transform GetFirePoint()
     {
-        if(enemyData.startingWeapon.weaponName == "PlasmaPistol")
-        {
-            int damageRoll = Random.Range(0, 3);
-            switch (damageRoll)
-            {
-                case 0:
-                    return minDamage;
-                case 1:
-                return mediDamage;
-                case 2:
-                    return maxDamage;
-            }
-        }
-        return 0f;
+        return activeFirePoint;
     }
 }

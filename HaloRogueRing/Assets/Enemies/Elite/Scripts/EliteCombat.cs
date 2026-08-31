@@ -1,21 +1,21 @@
 using UnityEngine;
 
-public class GruntCombat : EnemyCombat
+public class EliteCombat : EnemyCombat
 {
     [Header("Weapon Models")]
-    [SerializeField] public GameObject plasmaPistolModel;
-    [SerializeField] public GameObject needlerModel;
+    [SerializeField] private GameObject plasmaRifleModel;
+    [SerializeField] private GameObject needlerModel;
 
     [Header("Weapon Fire Points")]
-    [SerializeField] public Transform plasmaPistolFirePoint;
-    [SerializeField] public Transform needlerFirePoint;
+    [SerializeField] private Transform plasmaRifleFirePoint;
+    [SerializeField] private Transform needlerFirePoint;
 
     [Header("Projectile Prefabs")]
     [SerializeField] private PlasmaBolts plasmaBoltPrefab;
     [SerializeField] private Needles needleProjectilePrefab;
 
     [Header("Testing")]
-    [SerializeField] private float fireRate = 10f;
+    [SerializeField] private float fireRate = 1f;
 
     private float weaponDamage;
 
@@ -39,13 +39,22 @@ public class GruntCombat : EnemyCombat
             return;
         }
 
-        if (equippedWeapon.weaponName == "PlasmaPistol")
+        if (equippedWeapon.weaponName == "PlasmaRifle")
         {
-            weaponDamage = Random.Range(5f, 10.01f);
+            weaponDamage = Random.Range(5f, 7.01f);
         }
         else if (equippedWeapon.weaponName == "Needler")
         {
             weaponDamage = 5f;
+        }
+        else
+        {
+            Debug.LogWarning(
+                "No Elite damage value for weapon: " +
+                equippedWeapon.weaponName
+            );
+
+            weaponDamage = 0f;
         }
     }
 
@@ -54,9 +63,9 @@ public class GruntCombat : EnemyCombat
         if (equippedWeapon == null)
             return;
 
-        if (equippedWeapon.weaponName == "PlasmaPistol")
+        if (equippedWeapon.weaponName == "PlasmaRifle")
         {
-            SetFirePoint(plasmaPistolFirePoint);
+            SetFirePoint(plasmaRifleFirePoint);
         }
         else if (equippedWeapon.weaponName == "Needler")
         {
@@ -66,6 +75,9 @@ public class GruntCombat : EnemyCombat
 
     protected override void Fire()
     {
+        if (equippedWeapon == null)
+            return;
+
         if (activeFirePoint == null)
         {
             Debug.LogError(
@@ -77,9 +89,9 @@ public class GruntCombat : EnemyCombat
             return;
         }
 
-        if (equippedWeapon.weaponName == "PlasmaPistol")
+        if (equippedWeapon.weaponName == "PlasmaRifle")
         {
-            FirePlasmaPistol();
+            FirePlasmaRifle();
         }
         else if (equippedWeapon.weaponName == "Needler")
         {
@@ -91,23 +103,16 @@ public class GruntCombat : EnemyCombat
             (1f / fireRate);
     }
 
-    private void FirePlasmaPistol()
+    private void FirePlasmaRifle()
     {
         if (plasmaBoltPrefab == null)
-        {
-            Debug.LogError(
-                "No Plasma Bolt prefab assigned."
-            );
-
             return;
-        }
 
-        PlasmaBolts projectile =
-            Instantiate(
-                plasmaBoltPrefab,
-                activeFirePoint.position,
-                activeFirePoint.rotation
-            );
+        PlasmaBolts projectile = Instantiate(
+            plasmaBoltPrefab,
+            activeFirePoint.position,
+            activeFirePoint.rotation
+        );
 
         projectile.SetDamage(weaponDamage);
         projectile.SetFaction(Faction.Covenant);
@@ -116,20 +121,13 @@ public class GruntCombat : EnemyCombat
     private void FireNeedler()
     {
         if (needleProjectilePrefab == null)
-        {
-            Debug.LogError(
-                "No Needle Projectile prefab assigned."
-            );
-
             return;
-        }
 
-        Needles projectile =
-            Instantiate(
-                needleProjectilePrefab,
-                activeFirePoint.position,
-                activeFirePoint.rotation
-            );
+        Needles projectile = Instantiate(
+            needleProjectilePrefab,
+            activeFirePoint.position,
+            activeFirePoint.rotation
+        );
 
         projectile.SetDamage(weaponDamage);
         projectile.SetFaction(Faction.Covenant);
@@ -137,8 +135,8 @@ public class GruntCombat : EnemyCombat
 
     protected override void UpdateWeaponModel()
     {
-        if (plasmaPistolModel != null)
-            plasmaPistolModel.SetActive(false);
+        if (plasmaRifleModel != null)
+            plasmaRifleModel.SetActive(false);
 
         if (needlerModel != null)
             needlerModel.SetActive(false);
@@ -146,10 +144,10 @@ public class GruntCombat : EnemyCombat
         if (equippedWeapon == null)
             return;
 
-        if (equippedWeapon.weaponName == "PlasmaPistol")
+        if (equippedWeapon.weaponName == "PlasmaRifle")
         {
-            if (plasmaPistolModel != null)
-                plasmaPistolModel.SetActive(true);
+            if (plasmaRifleModel != null)
+                plasmaRifleModel.SetActive(true);
         }
         else if (equippedWeapon.weaponName == "Needler")
         {
@@ -163,4 +161,3 @@ public class GruntCombat : EnemyCombat
         return weaponDamage;
     }
 }
-
