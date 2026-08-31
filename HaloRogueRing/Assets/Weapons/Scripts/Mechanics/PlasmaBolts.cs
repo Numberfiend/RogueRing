@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PlasmaBolts : MonoBehaviour
 {
+    [SerializeField] private Faction faction;
     [SerializeField] private float speed = 25f;
     [SerializeField] private float lifetime = 5f;
 
@@ -17,6 +18,14 @@ public class PlasmaBolts : MonoBehaviour
         Destroy(gameObject, lifetime);
     }
 
+    public void SetDamage(float newDamage)
+    {
+        damage = newDamage;
+    }
+    public void SetFaction( Faction newFaction)
+    {
+        faction = newFaction;
+    }
     private void Update()
     {
         transform.position +=
@@ -24,13 +33,27 @@ public class PlasmaBolts : MonoBehaviour
             speed * Time.deltaTime;
     }
 
+ 
+
     private void OnTriggerEnter(Collider other)
     {
-        TempEnemyHealth health = other.GetComponent<TempEnemyHealth>();
-        if (health != null) 
+        if (faction == Faction.Player)
         {
-            health.TakeDamage(damage);
+            EnemyHealth enemyHealth = other.GetComponent<EnemyHealth>();
+            if (enemyHealth != null)
+            {
+                enemyHealth.TakeDamage(damage);
+            }
         }
+        else if(faction == Faction.Covenant)
+        {
+            PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
+            if(playerHealth != null)
+            {
+                playerHealth.TakeDamage(damage);
+            }
+        }
+        
         Destroy(gameObject);
 
     }

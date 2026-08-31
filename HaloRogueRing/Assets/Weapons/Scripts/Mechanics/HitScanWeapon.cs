@@ -28,8 +28,8 @@ public class HitScanWeapon : Weapon
             out RaycastHit hit,
             weaponData.range))
         {
-            TempEnemyHealth health =
-                hit.collider.GetComponent<TempEnemyHealth>();
+            EnemyHealth health =
+                hit.collider.GetComponent<EnemyHealth>();
 
             if (health != null)
             {

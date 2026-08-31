@@ -13,7 +13,7 @@ public class ProjectileWeapon : Weapon
             projectilePrefab, muzzlePoint.position, muzzlePoint.rotation);
 
         projectile.Intialize(weaponData.damage);
-
+        projectile.SetFaction(Faction.Player);
         return true;
     }
 }
