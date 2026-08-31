@@ -80,6 +80,10 @@ crashlytics-build.properties
 
 # Ignore the Cache folder since it is updated locally.
 /[Aa]ssets/Plugins/FMOD/Cache/*
+/Fmod/RogueRing/.unsaved
+/Fmod/RogueRing/.cache
+/Fmod/RogueRing/.user
+/Fmod/RogueRing/Metadata
 
 /FMODProject/UFO/.cache
 /FMODProject/UFO/.unsaved
