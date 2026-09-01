@@ -72,6 +72,11 @@ public class EnemyHealth : MonoBehaviour
     }
     private void Die()
     {
+        EnemyCombat enemyCombat = GetComponent<EnemyCombat>();
+        if(enemyCombat != null)
+        {
+            enemyCombat.DropWeapon();
+        }
         Debug.Log(enemyData.enemyName + "Died");
         Destroy(gameObject);
     }

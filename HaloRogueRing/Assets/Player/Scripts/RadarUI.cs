@@ -36,7 +36,8 @@ public class RadarUI : MonoBehaviour
         List<Transform> removeList = new();
         foreach (var pair in blips)
         {
-            if (!motionTracker.trackedEnemies.Contains(pair.Key))
+            if (pair.Key == null ||
+                !motionTracker.trackedEnemies.Contains(pair.Key))
             {
                 Destroy(pair.Value.gameObject);
                 removeList.Add(pair.Key);
@@ -54,22 +55,33 @@ public class RadarUI : MonoBehaviour
             Transform enemy = pair.Key;
             RectTransform blip = pair.Value;
 
+            if (enemy == null)
+                continue;
+
             Vector3 worldOffset = enemy.position - player.position;
 
             worldOffset.y = 0f;
 
-            Vector3 localOffset = Quaternion.Inverse(player.rotation) * worldOffset;
+            Vector3 localOffset =
+                Quaternion.Inverse(player.rotation) *
+                worldOffset;
 
-            Vector2 radarPos = new Vector2(localOffset.x, localOffset.z);
+            Vector2 radarPos =
+                new Vector2(
+                    localOffset.x,
+                    localOffset.z
+                );
 
             radarPos /= motionTracker.DetectionRadius;
             radarPos *= radarRadius;
 
-            if(radarPos.magnitude > radarRadius)
+            if (radarPos.magnitude > radarRadius)
             {
-                radarPos = radarPos.normalized * radarRadius;
-
+                radarPos =
+                    radarPos.normalized *
+                    radarRadius;
             }
+
             blip.anchoredPosition = radarPos;
         }
     }

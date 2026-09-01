@@ -31,5 +31,6 @@ public class WeaponData : ScriptableObject
 
     [Header("WorldPrefab")]
     public GameObject worldPrefab;
+
 }
 

@@ -8,6 +8,7 @@ public abstract class EnemyCombat : MonoBehaviour
     [Header("Weapon Selection")]
     [SerializeField] protected int activeWeaponIndex = 0;
 
+    [SerializeField] private Transform weaponDropPoint;
     protected WeaponData equippedWeapon;
     protected Transform activeFirePoint;
 
@@ -67,6 +68,20 @@ public abstract class EnemyCombat : MonoBehaviour
             enemyData.availibleWeapons[activeWeaponIndex];
     }
 
+    public void DropWeapon()
+    {
+        Vector3 dropPoint;
+        if(weaponDropPoint != null)
+        {
+            dropPoint = weaponDropPoint.position;
+        }
+        else
+        {
+            dropPoint = transform.position;
+        }
+        Instantiate(equippedWeapon.worldPrefab,
+            dropPoint, transform.rotation);
+    }
     protected void SetFirePoint(Transform firePoint)
     {
         activeFirePoint = firePoint;

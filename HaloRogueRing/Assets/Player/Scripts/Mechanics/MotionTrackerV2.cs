@@ -28,6 +28,8 @@ public class MotionTrackerV2 : MonoBehaviour
 
     private void ScanEnemies()
     {
+        trackedEnemies.RemoveAll(enemy => enemy == null);
+
         HashSet<Transform> detectedEnemies = new();
 
         Collider[] hits = Physics.OverlapSphere(transform.position, detectionRad);
