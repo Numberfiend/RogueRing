@@ -93,6 +93,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7d2890f83e884cc489396ec6e5273719, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1944406520453666676}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7d2890f83e884cc489396ec6e5273719, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8008681530752387919}
   m_SourcePrefab: {fileID: 100100000, guid: 7d2890f83e884cc489396ec6e5273719, type: 3}
 --- !u!1 &3990381738529292336 stripped
 GameObject:
@@ -117,6 +120,53 @@ MonoBehaviour:
   maxHeat: 100
   heatperShot: 5
   cooldownRate: 20
+--- !u!114 &8008681530752387919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3990381738529292336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fe3e65af9b82c745b2ffd0a93d1a627, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponAudio
+  fireEvent:
+    Guid:
+      Data1: -975492442
+      Data2: 1199551095
+      Data3: 1030687419
+      Data4: -1387574912
+    Path: event:/WeaponEvents/PlasmaRifle/Shot
+  reloadEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  dryFireEvent:
+    Guid:
+      Data1: 1991400464
+      Data2: 1272909899
+      Data3: 1850048650
+      Data4: -1429445137
+    Path: event:/WeaponEvents/PlasmaRifle/DryShot
+  overheatEvent:
+    Guid:
+      Data1: -1505356112
+      Data2: 1213787686
+      Data3: 1563032965
+      Data4: -1133358184
+    Path: event:/WeaponEvents/PlasmaRifle/Overheat
+  chargeEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
 --- !u!4 &4335699391471868554 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7d2890f83e884cc489396ec6e5273719, type: 3}

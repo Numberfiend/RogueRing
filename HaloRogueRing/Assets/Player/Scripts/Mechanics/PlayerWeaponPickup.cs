@@ -4,6 +4,7 @@ public class PlayerWeaponPickup : MonoBehaviour
 {
     [SerializeField] private Transform weaponHolder;
     [SerializeField] private Camera playerCamera;
+    [SerializeField] private PickupUI pickupUI;
     private WeaponPickup nearbyWeapon;
     private WeaponInventory inventory;
 
@@ -71,7 +72,15 @@ public class PlayerWeaponPickup : MonoBehaviour
         Weapon weapon = weaponHolder.GetComponentInChildren<Weapon>();
         if (weapon == null)
             return;
-        weapon.Reload();
+        bool reloaded = weapon.Reload();
+        if(reloaded == true)
+        {
+            WeaponAudio weaponAudio = weapon.GetComponent<WeaponAudio>();
+            if (weaponAudio != null)
+            {
+                weaponAudio.PlayReload();
+            }
+        }
     }
     /*private void TryShoot()
     {
@@ -145,15 +154,27 @@ public class PlayerWeaponPickup : MonoBehaviour
         Destroy(nearbyWeapon.gameObject);
 
         nearbyWeapon = null;
+        pickupUI.Hide();
     }
 
     private void OnTriggerEnter(Collider other)
     {
         WeaponPickup weapon = other.GetComponent<WeaponPickup>();
 
-        if(weapon != null)
+        if (weapon != null)
         {
             nearbyWeapon = weapon;
+
+            Weapon weaponComponent =
+                weapon.equippedPrefab.GetComponent<Weapon>();
+
+            if (weaponComponent != null)
+            {
+                string weaponName =
+                    weaponComponent.GetWeaponData().weaponName;
+
+                pickupUI.Show("E",weaponName);
+            }
         }
     }
 
@@ -161,11 +182,13 @@ public class PlayerWeaponPickup : MonoBehaviour
     {
         WeaponPickup weapon = other.GetComponent<WeaponPickup>();
 
-        if(weapon != null && weapon == nearbyWeapon)
+        if (weapon != null && weapon == nearbyWeapon)
         {
             nearbyWeapon = null;
+
+            pickupUI.Hide();
         }
     }
 
-    
+
 }

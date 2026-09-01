@@ -59,6 +59,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 40f7282879360df44b2bd818689a66f7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6185169944417617044}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 40f7282879360df44b2bd818689a66f7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 863151204346337110}
   m_SourcePrefab: {fileID: 100100000, guid: 40f7282879360df44b2bd818689a66f7, type: 3}
 --- !u!1 &6534251261460679471 stripped
 GameObject:
@@ -78,3 +81,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Pistol
   weaponData: {fileID: 11400000, guid: 980964a67f3239147aa7970bef5209c5, type: 2}
+  aimDistance: 1000
+--- !u!114 &863151204346337110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6534251261460679471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fe3e65af9b82c745b2ffd0a93d1a627, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponAudio
+  fireEvent:
+    Guid:
+      Data1: -501508124
+      Data2: 1219630726
+      Data3: -1654397790
+      Data4: 1151509583
+    Path: event:/WeaponEvents/Magnum/Shot
+  reloadEvent:
+    Guid:
+      Data1: -406867784
+      Data2: 1204404468
+      Data3: 1310507163
+      Data4: -893295352
+    Path: event:/WeaponEvents/Magnum/Reload
+  dryFireEvent:
+    Guid:
+      Data1: -406867784
+      Data2: 1204404468
+      Data3: 1310507163
+      Data4: -893295352
+    Path: event:/WeaponEvents/Magnum/Reload

@@ -93,6 +93,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43a6cad95150175448fa6ef8121b4339, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7207858957691548678}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 43a6cad95150175448fa6ef8121b4339, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6982462509587789564}
   m_SourcePrefab: {fileID: 100100000, guid: 43a6cad95150175448fa6ef8121b4339, type: 3}
 --- !u!4 &8259000013255448469 stripped
 Transform:
@@ -119,3 +122,57 @@ MonoBehaviour:
   weaponData: {fileID: 11400000, guid: ebee9c07fbf018741975adb43b9727be, type: 2}
   projectilePrefab: {fileID: -3772415414098356877, guid: 5c2923e800607c44aab08317e5d5d948, type: 3}
   muzzlePoint: {fileID: 1726702492918345295}
+--- !u!114 &6982462509587789564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8779218188525751599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fe3e65af9b82c745b2ffd0a93d1a627, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponAudio
+  fireEvent:
+    Guid:
+      Data1: -375787395
+      Data2: 1111315609
+      Data3: -1960676222
+      Data4: -1914844281
+    Path: event:/WeaponEvents/Needler/Shot
+  reloadEvent:
+    Guid:
+      Data1: 2101244917
+      Data2: 1313920719
+      Data3: -1442953079
+      Data4: 1737202266
+    Path: event:/WeaponEvents/Needler/Reload
+  dryFireEvent:
+    Guid:
+      Data1: -2078852674
+      Data2: 1151828435
+      Data3: 339547540
+      Data4: -1166808740
+    Path: event:/WeaponEvents/Needler/Dryshot
+  overheatEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  chargeEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  chargeShot:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 

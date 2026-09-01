@@ -127,3 +127,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Needles
   speed: 35
   lifetime: 5
+  homingRange: 30
+  homingStrength: 8
+  maximumHomingAngle: 25
+  homingHitDistance: 0.3

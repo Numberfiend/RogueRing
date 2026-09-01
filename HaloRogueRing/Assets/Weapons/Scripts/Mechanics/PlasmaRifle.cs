@@ -39,6 +39,10 @@ public class PlasmaRifle : ProjectileWeapon
                 currentHeat = maxHeat;
                 overheated = true;
                 Debug.Log("OVERHEAT");
+                if(weaponAudio != null)
+                {
+                    weaponAudio.PlayOverheat();
+                }
             }
         }
     }

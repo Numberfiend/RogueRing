@@ -2,6 +2,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.Events;
 public class PlayerHealth : MonoBehaviour
 {
     [Header("Health")]
@@ -13,6 +14,13 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private float currentShield;
     [SerializeField] private float shieldRechargeDelay = 5f;
     [SerializeField] private float shieldRechargeRate = 25f;
+    public UnityEvent OnShieldDepleted;
+    public UnityEvent OnShieldRechargeStart;
+    public UnityEvent OnShieldRecovered;
+    public UnityEvent OnShieldDamaged;
+    private bool shieldDepletedTriggered;
+    private bool rechargeStartedTriggered;
+    private bool shieldRecoveredTriggered;
 
     [Header("UI")]
     [SerializeField] private Slider healthSlider;
@@ -38,12 +46,21 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
+        OnShieldDamaged?.Invoke();
         lastDamageTime = Time.time;
 
-        if(currentShield > 0f)
+        rechargeStartedTriggered = false;
+        shieldRecoveredTriggered = false;
+
+        if (currentShield > 0f)
         {
             currentShield -= damage;
             currentShield = Mathf.Max(currentShield, 0f);
+            if (currentShield <= 0f && !shieldDepletedTriggered)
+            {
+                shieldDepletedTriggered = true;
+                OnShieldDepleted?.Invoke();
+            }
         }
         else
         {
@@ -63,11 +80,33 @@ public class PlayerHealth : MonoBehaviour
 
     private void RechargeShield()
     {
-        if (currentShield >= maxShield) return;
-        if (Time.time < lastDamageTime + shieldRechargeDelay) return;
+        if (currentShield >= maxShield)
+            return;
+
+        if (Time.time < lastDamageTime + shieldRechargeDelay)
+            return;
+
+        if (!rechargeStartedTriggered)
+        {
+            rechargeStartedTriggered = true;
+            OnShieldRechargeStart?.Invoke();
+        }
 
         currentShield += shieldRechargeRate * Time.deltaTime;
         currentShield = Mathf.Min(currentShield, maxShield);
+
+        float shieldPercent =
+            currentShield / maxShield;
+
+        if (shieldPercent >= 0.25f &&
+            !shieldRecoveredTriggered)
+        {
+            shieldRecoveredTriggered = true;
+            shieldDepletedTriggered = false;
+
+            OnShieldRecovered?.Invoke();
+        }
+
         UpdateUI();
     }
     private void UpdateUI()

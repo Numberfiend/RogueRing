@@ -93,6 +93,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c36636a8410a8fe4e822e16cd5e708bd, type: 3}
       insertIndex: -1
       addedObject: {fileID: 750103951915685937}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c36636a8410a8fe4e822e16cd5e708bd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -2006265138594788093}
   m_SourcePrefab: {fileID: 100100000, guid: c36636a8410a8fe4e822e16cd5e708bd, type: 3}
 --- !u!1 &2811808613113421397 stripped
 GameObject:
@@ -117,6 +120,60 @@ MonoBehaviour:
   maxChargeTime: 2
   chargedDamageMultiplier: 7
   chargedBatteryCost: 11
+--- !u!114 &-2006265138594788093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2811808613113421397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fe3e65af9b82c745b2ffd0a93d1a627, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponAudio
+  fireEvent:
+    Guid:
+      Data1: 485881933
+      Data2: 1325174299
+      Data3: -715338318
+      Data4: -1995810464
+    Path: event:/WeaponEvents/PlasmaPistol/Shot
+  reloadEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  dryFireEvent:
+    Guid:
+      Data1: 597796287
+      Data2: 1082124922
+      Data3: -776517442
+      Data4: 327397894
+    Path: event:/WeaponEvents/PlasmaPistol/DryShot
+  overheatEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  chargeEvent:
+    Guid:
+      Data1: -2013722420
+      Data2: 1284094970
+      Data3: 1084042155
+      Data4: -615324473
+    Path: event:/WeaponEvents/PlasmaPistol/Charge
+  chargeShot:
+    Guid:
+      Data1: 1470115104
+      Data2: 1078483091
+      Data3: 207053979
+      Data4: -1979411308
+    Path: event:/WeaponEvents/PlasmaPistol/ChargeShot
 --- !u!4 &3192592151849600239 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: c36636a8410a8fe4e822e16cd5e708bd, type: 3}

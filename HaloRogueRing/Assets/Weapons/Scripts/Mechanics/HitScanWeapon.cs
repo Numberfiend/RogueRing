@@ -4,10 +4,36 @@ using UnityEngine;
 public class HitScanWeapon : Weapon
 {
     [SerializeField] private float aimDistance = 1000f;
+
+    private WeaponAudio weaponAudio;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        weaponAudio = GetComponent<WeaponAudio>();
+    }
+
+    public override void StartFire()
+    {
+        if (IsEmpty())
+        {
+            if(weaponAudio != null)
+            {
+                weaponAudio.PlayDryFire();
+            }
+            return;
+        }
+    }
+
     public override bool Fire()
     {
         if (!base.Fire())
             return false;
+        
+        if(weaponAudio != null)
+        {
+            weaponAudio.PlayFire();
+        }
 
         if (playerCamera == null)
             return false;

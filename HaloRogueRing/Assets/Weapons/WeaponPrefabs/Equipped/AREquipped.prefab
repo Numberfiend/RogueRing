@@ -59,6 +59,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 37f4f0b0887de214ea59a5b57ec6fe81, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5794301061978345675}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 37f4f0b0887de214ea59a5b57ec6fe81, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -334886735479745137}
   m_SourcePrefab: {fileID: 100100000, guid: 37f4f0b0887de214ea59a5b57ec6fe81, type: 3}
 --- !u!1 &3144869491316553937 stripped
 GameObject:
@@ -78,3 +81,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AssaultRifle
   weaponData: {fileID: 11400000, guid: 3fb2aaedd1edae44db9c650a0353e55e, type: 2}
+  aimDistance: 1000
+--- !u!114 &-334886735479745137
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3144869491316553937}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fe3e65af9b82c745b2ffd0a93d1a627, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponAudio
+  fireEvent:
+    Guid:
+      Data1: -1197180525
+      Data2: 1260059127
+      Data3: -835819616
+      Data4: -1917786948
+    Path: event:/WeaponEvents/AssaultRifle/Shot
+  reloadEvent:
+    Guid:
+      Data1: 819073565
+      Data2: 1217355654
+      Data3: 543362743
+      Data4: 1190990744
+    Path: event:/WeaponEvents/AssaultRifle/Reload
+  dryFireEvent:
+    Guid:
+      Data1: 1845288183
+      Data2: 1337810556
+      Data3: -948437079
+      Data4: 2114723621
+    Path: event:/WeaponEvents/AssaultRifle/DryShot

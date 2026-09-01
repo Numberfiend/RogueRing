@@ -102,10 +102,13 @@ public class Weapon : MonoBehaviour
 
         return true;
     }
-    public virtual void Reload()
+    public virtual bool Reload()
     {
-        if (state.currentAmmo >= weaponData.magazineSize) return;
-        if(state.reserveAmmo <= 0) return;
+        if (state.currentAmmo >= weaponData.magazineSize)
+            return false;
+
+        if (state.reserveAmmo <= 0)
+            return false;
 
         int ammoNeeded =
             weaponData.magazineSize -
@@ -115,12 +118,27 @@ public class Weapon : MonoBehaviour
             Mathf.Min(
                 ammoNeeded,
                 state.reserveAmmo);
+
         state.currentAmmo += ammoToLoad;
         state.reserveAmmo -= ammoToLoad;
-        Debug.Log("Reloaded. Magazine: " +
-                  state.currentAmmo +
-                  "Reserve: " +
-                  state.reserveAmmo);
+
+        Debug.Log(
+            "Reloaded. Magazine: " +
+            state.currentAmmo +
+            " Reserve: " +
+            state.reserveAmmo);
+
+        return true;
+    }
+
+    public bool IsEmpty()
+    {
+        if (weaponData.ammoType == AmmoType.Magazine)
+        {
+            return state.currentAmmo <= 0;
+        }
+
+        return state.batteryCharge < weaponData.batteryCost;
     }
 
     public virtual void StartFire()
