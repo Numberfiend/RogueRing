@@ -115,3 +115,31 @@ MonoBehaviour:
       Data3: 1310507163
       Data4: -893295352
     Path: event:/WeaponEvents/Magnum/Reload
+  pickupEvent:
+    Guid:
+      Data1: -1797556915
+      Data2: 1079640994
+      Data3: 261048472
+      Data4: -59228211
+    Path: event:/WeaponEvents/Magnum/Pickup
+  overheatEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  chargeEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  chargeShot:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 

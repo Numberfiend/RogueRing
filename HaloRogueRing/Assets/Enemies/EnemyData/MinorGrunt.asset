@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MinorGrunt
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   enemyName: MinorGrunt
-  maxHealth: 500
+  maxHealth: 30
   maxShield: 0
   availibleWeapons:
   - {fileID: 11400000, guid: 0464764512b096b49894e0e6df9946a1, type: 2}

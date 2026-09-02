@@ -35,6 +35,9 @@ public class PlayerMovement : MonoBehaviour
         lookAction = playerinput.actions.FindAction("Look");
 
         controller = GetComponent<CharacterController>();
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void FixedUpdate()
@@ -46,6 +49,18 @@ public class PlayerMovement : MonoBehaviour
         Move();
         look();
         jumping();
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
     public void Move()
     {

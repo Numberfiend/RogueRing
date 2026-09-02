@@ -9,6 +9,7 @@ public class WeaponAudio : MonoBehaviour
     [SerializeField] private EventReference fireEvent;
     [SerializeField] private EventReference reloadEvent;
     [SerializeField] private EventReference dryFireEvent;
+    [SerializeField] private EventReference pickupEvent;
 
     [Header("Plasma Rifle Unique Sounds")]
     [SerializeField] private EventReference overheatEvent;
@@ -65,6 +66,14 @@ public class WeaponAudio : MonoBehaviour
         if (!chargeShot.IsNull)
         {
             RuntimeManager.PlayOneShot(chargeShot, transform.position );
+        }
+    }
+
+    public void OnPickup()
+    {
+        if (!pickupEvent.IsNull)
+        {
+            RuntimeManager.PlayOneShot(pickupEvent, transform.position );
         }
     }
 

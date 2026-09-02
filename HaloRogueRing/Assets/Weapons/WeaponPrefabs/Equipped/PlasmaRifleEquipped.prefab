@@ -153,6 +153,13 @@ MonoBehaviour:
       Data3: 1850048650
       Data4: -1429445137
     Path: event:/WeaponEvents/PlasmaRifle/DryShot
+  pickupEvent:
+    Guid:
+      Data1: -1230469978
+      Data2: 1337340182
+      Data3: 2069326469
+      Data4: 750758296
+    Path: event:/WeaponEvents/PlasmaRifle/Pickup
   overheatEvent:
     Guid:
       Data1: -1505356112
@@ -161,6 +168,13 @@ MonoBehaviour:
       Data4: -1133358184
     Path: event:/WeaponEvents/PlasmaRifle/Overheat
   chargeEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  chargeShot:
     Guid:
       Data1: 0
       Data2: 0

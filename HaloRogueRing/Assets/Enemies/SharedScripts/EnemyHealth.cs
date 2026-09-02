@@ -9,11 +9,14 @@ public class EnemyHealth : MonoBehaviour
     [SerializeField] private float shieldRechargeDelay = 5f;
     [SerializeField] private float shieldRechargeRate = 25f;
 
+    private CommonEnemyAudio enemyAudio;
+
     private float shieldRechargeTimer;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        enemyAudio = GetComponent<CommonEnemyAudio>();
         if (enemyData == null)
         {
             Debug.LogError(
@@ -51,7 +54,19 @@ public class EnemyHealth : MonoBehaviour
 
         if (currentHealth <= 0)
         {
+            if (enemyAudio != null)
+            {
+                enemyAudio.OnDeath();
+            }
+
             Die();
+        }
+        else
+        {
+            if (enemyAudio != null)
+            {
+                enemyAudio.OnDamage();
+            }
         }
     }
 

@@ -153,6 +153,13 @@ MonoBehaviour:
       Data3: -776517442
       Data4: 327397894
     Path: event:/WeaponEvents/PlasmaPistol/DryShot
+  pickupEvent:
+    Guid:
+      Data1: 1864356306
+      Data2: 1136392508
+      Data3: 1945353345
+      Data4: 76743003
+    Path: event:/WeaponEvents/PlasmaPistol/Pickup
   overheatEvent:
     Guid:
       Data1: 0

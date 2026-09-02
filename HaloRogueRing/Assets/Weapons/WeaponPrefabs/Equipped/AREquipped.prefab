@@ -115,3 +115,31 @@ MonoBehaviour:
       Data3: -948437079
       Data4: 2114723621
     Path: event:/WeaponEvents/AssaultRifle/DryShot
+  pickupEvent:
+    Guid:
+      Data1: -1417288552
+      Data2: 1185592457
+      Data3: 820773022
+      Data4: 343203475
+    Path: event:/WeaponEvents/AssaultRifle/Pickup
+  overheatEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  chargeEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  chargeShot:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
