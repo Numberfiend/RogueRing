@@ -99,6 +99,12 @@ public class Weapon : MonoBehaviour
             weaponData.maxSpread
         );
 
+        WeaponBob bob = GetComponentInParent<WeaponBob>();
+
+        if (bob != null)
+        {
+            bob.OnFire();
+        }
 
         return true;
     }

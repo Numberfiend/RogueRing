@@ -50,6 +50,7 @@ public class PlayerWeaponPickup : MonoBehaviour
         if (shootAction.WasPressedThisFrame())
         {
            StartFire();
+            
         }
         if (shootAction.IsPressed())
         {
