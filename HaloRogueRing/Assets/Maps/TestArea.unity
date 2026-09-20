@@ -2909,6 +2909,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e5e0f5a2b67103342a78d06c17e1236f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 794887124}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e5e0f5a2b67103342a78d06c17e1236f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 794887125}
   m_SourcePrefab: {fileID: 100100000, guid: e5e0f5a2b67103342a78d06c17e1236f, type: 3}
 --- !u!1 &794887116 stripped
 GameObject:
@@ -3051,6 +3054,21 @@ MonoBehaviour:
       Data4: -32834373
     Path: event:/EnemyEvents/Grunts/OnDamage
   damageSoundChance: 0.3
+--- !u!114 &794887125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 794887116}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc96bed081002eb4489afaead0ffe9a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GruntAI
+  startingAction: 8
+  sightRange: 20
+  sighAngle: 120
 --- !u!1 &803879125
 GameObject:
   m_ObjectHideFlags: 0
@@ -4965,6 +4983,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e5e0f5a2b67103342a78d06c17e1236f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1150675163}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e5e0f5a2b67103342a78d06c17e1236f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1150675164}
   m_SourcePrefab: {fileID: 100100000, guid: e5e0f5a2b67103342a78d06c17e1236f, type: 3}
 --- !u!1 &1150675156 stripped
 GameObject:
@@ -5090,6 +5111,21 @@ MonoBehaviour:
       Data4: -32834373
     Path: event:/EnemyEvents/Grunts/OnDamage
   damageSoundChance: 0.3
+--- !u!114 &1150675164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1150675156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc96bed081002eb4489afaead0ffe9a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GruntAI
+  startingAction: 8
+  sightRange: 20
+  sighAngle: 120
 --- !u!1 &1209767252
 GameObject:
   m_ObjectHideFlags: 0
