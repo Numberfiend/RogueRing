@@ -11,6 +11,7 @@ public abstract class EnemyCombat : MonoBehaviour
     [SerializeField] private Transform weaponDropPoint;
     protected WeaponData equippedWeapon;
     protected Transform activeFirePoint;
+    private bool canFire;
 
     protected float nextFireTime;
 
@@ -19,10 +20,21 @@ public abstract class EnemyCombat : MonoBehaviour
         SetActiveWeapon();
         UpdateWeaponModel();
     }
+    public void StartFiring()
+    {
+        canFire = true;
+    }
+    public void StopFiring()
+    {
+        canFire = false;
+    }
 
     protected virtual void Update()
     {
         if (equippedWeapon == null)
+            return;
+
+        if (!canFire)
             return;
 
         if (Time.time >= nextFireTime)

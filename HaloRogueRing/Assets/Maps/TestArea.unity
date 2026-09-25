@@ -2912,6 +2912,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e5e0f5a2b67103342a78d06c17e1236f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 794887125}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e5e0f5a2b67103342a78d06c17e1236f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 794887126}
   m_SourcePrefab: {fileID: 100100000, guid: e5e0f5a2b67103342a78d06c17e1236f, type: 3}
 --- !u!1 &794887116 stripped
 GameObject:
@@ -3068,7 +3071,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GruntAI
   startingAction: 8
   sightRange: 20
-  sighAngle: 120
+  sightAngle: 120
+  memoryDuration: 10
+  minFightTime: 3
+  maxFightTime: 5
+  turnSpeed: 60
+--- !u!195 &794887126
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 794887116}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 1
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &803879125
 GameObject:
   m_ObjectHideFlags: 0
@@ -4986,6 +5015,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e5e0f5a2b67103342a78d06c17e1236f, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1150675164}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e5e0f5a2b67103342a78d06c17e1236f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1150675165}
   m_SourcePrefab: {fileID: 100100000, guid: e5e0f5a2b67103342a78d06c17e1236f, type: 3}
 --- !u!1 &1150675156 stripped
 GameObject:
@@ -5125,7 +5157,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GruntAI
   startingAction: 8
   sightRange: 20
-  sighAngle: 120
+  sightAngle: 120
+  memoryDuration: 10
+  minFightTime: 3
+  maxFightTime: 5
+  turnSpeed: 60
+--- !u!195 &1150675165
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1150675156}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &1209767252
 GameObject:
   m_ObjectHideFlags: 0
@@ -7033,6 +7091,7 @@ GameObject:
   - component: {fileID: 2018421490}
   - component: {fileID: 2018421489}
   - component: {fileID: 2018421488}
+  - component: {fileID: 2018421492}
   m_Layer: 0
   m_Name: Floor
   m_TagString: Untagged
@@ -7133,6 +7192,38 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2018421492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2018421487}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 0
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 0
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 388b13942c36f54479506f765420c705, type: 2}
+  m_BuildHeightMesh: 0
 --- !u!1 &2023523297
 GameObject:
   m_ObjectHideFlags: 0

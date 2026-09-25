@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class GruntAI : MonoBehaviour
 {
@@ -17,8 +18,13 @@ public class GruntAI : MonoBehaviour
     [Header("Combat")]
     [SerializeField] private float minFightTime = 3f;
     [SerializeField] private float maxFightTime = 5f;
+    [SerializeField] private float turnSpeed = 60f;
     private float actionTimer;
 
+    private GruntCombat combatscript;
+    private NavMeshAgent agent;
+    private bool searchingForPlayer;
+    private float searchTurnDirection;
     private Vector3 repositionPoint;
     public AiActions CurrentAction
     {
@@ -28,6 +34,8 @@ public class GruntAI : MonoBehaviour
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        agent = GetComponent<NavMeshAgent>();
+        combatscript = GetComponent<GruntCombat>();
         CurrentAction = startingAction;   
     }
     private bool CanSeePlayer()
@@ -90,6 +98,9 @@ public class GruntAI : MonoBehaviour
             case AiActions.Wait:
                 Wait();
                 break;
+            case AiActions.Guard:
+                Guard();
+                break;
         }
     }
     private void Sleep()
@@ -104,22 +115,39 @@ public class GruntAI : MonoBehaviour
 
     private void Fight()
     {
-        if(CanSeePlayer())
+        combatscript.StartFiring();
+
+        if (CanSeePlayer())
         {
             RememberPlayer();
-        }
-        else
-        {
-            SetActions(AiActions.Search);
+
+            Vector3 lookTarget = player.position;
+            lookTarget.y = transform.position.y;
+
+            Quaternion targetRotation = Quaternion.LookRotation(lookTarget - transform.position);
+
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation,
+                targetRotation,
+                turnSpeed * Time.deltaTime);
+            
+
+            actionTimer -= Time.deltaTime;
+
+            if (actionTimer <= 0)
+            {
+                SetActions(AiActions.Uncover);
+            }
+
             return;
         }
-        
-        actionTimer -= Time.deltaTime;
-        
-        if(actionTimer < 0)
-        {
-            SetActions(AiActions.Uncover);
-        }
+
+        combatscript.StopFiring();
+
+        searchingForPlayer = true;
+        actionTimer = 3f;
+        searchTurnDirection = Random.value < 0.5f ? -1f : 1f;
+        SetActions(AiActions.Search);
     }
 
     private void Flee()
@@ -128,18 +156,50 @@ public class GruntAI : MonoBehaviour
     }
     private void Search()
     {
+        combatscript.StopFiring();
+
         if (CanSeePlayer())
         {
             SetActions(AiActions.Fight);
             return;
         }
+
         if (!HasPlayerMemory())
         {
+            searchingForPlayer = false;
             SetActions(AiActions.Wait);
+            return;
+        }
+
+        agent.SetDestination(lastKnownPlayerPosition);
+
+        if (!agent.pathPending &&
+    agent.remainingDistance <= 1f)
+        {
+            agent.isStopped = true;
+
+            transform.Rotate(
+                Vector3.up,
+                turnSpeed * searchTurnDirection * Time.deltaTime
+            );
+
+            actionTimer -= Time.deltaTime;
+
+            if (actionTimer <= 0f)
+            {
+                agent.isStopped = false;
+                searchingForPlayer = false;
+                SetActions(AiActions.Wait);
+            }
         }
     }
     private void Wait()
     {
+        combatscript.StopFiring();
+        transform.Rotate(
+        Vector3.up,
+        turnSpeed * Time.deltaTime);
+
         if (CanSeePlayer())
         {
             SetActions(AiActions.Alert);
@@ -147,30 +207,46 @@ public class GruntAI : MonoBehaviour
     }
     private void Uncover()
     {
+        combatscript.StopFiring();
         PickRepositionPoint();
-        actionTimer = Random.Range(minFightTime, maxFightTime);
+        agent.SetDestination(repositionPoint);
+        SetActions(AiActions.Guard);
+    }
+    private void Guard()
+    {
+        if (agent.pathPending)
+            return;
+
+        if (agent.remainingDistance > 1f)
+            return;
+
+        actionTimer =
+            Random.Range(
+                minFightTime,
+                maxFightTime);
+
         SetActions(AiActions.Fight);
     }
     private void PickRepositionPoint()
     {
-        Vector3 right =
-            transform.right *
+        Vector3 directionFromPlayer =
+        (transform.position -
+         player.position).normalized;
+
+        Vector3 sideOffset =
+            Vector3.Cross(
+                Vector3.up,
+                directionFromPlayer) *
             Random.Range(-5f, 5f);
 
-        Vector3 forward =
-            transform.forward *
-            Random.Range(-3f, 3f);
+        Vector3 distanceOffset =
+            directionFromPlayer *
+            Random.Range(2f, 6f);
 
         repositionPoint =
             transform.position +
-            right +
-            forward;
-
-        Debug.DrawLine(
-            transform.position,
-            repositionPoint,
-            Color.blue,
-            2f);
+            sideOffset +
+            distanceOffset;
 
         Debug.Log(
             gameObject.name +
