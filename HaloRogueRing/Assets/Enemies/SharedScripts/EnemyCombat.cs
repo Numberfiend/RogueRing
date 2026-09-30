@@ -13,6 +13,8 @@ public abstract class EnemyCombat : MonoBehaviour
     protected Transform activeFirePoint;
     private bool canFire;
 
+    protected Transform currentTarget;
+
     protected float nextFireTime;
 
     protected virtual void Start()
@@ -27,6 +29,10 @@ public abstract class EnemyCombat : MonoBehaviour
     public void StopFiring()
     {
         canFire = false;
+    }
+    public void SetTarget(Transform target)
+    {
+        currentTarget = target;
     }
 
     protected virtual void Update()

@@ -66,6 +66,7 @@ public class GruntCombat : EnemyCombat
 
     protected override void Fire()
     {
+        if (currentTarget == null) return;
         if (activeFirePoint == null)
         {
             Debug.LogError(
@@ -101,12 +102,13 @@ public class GruntCombat : EnemyCombat
 
             return;
         }
-
+        Vector3 targetPosition = currentTarget.position + Vector3.up * 10f;
+        Vector3 direction = (currentTarget.position - activeFirePoint.position).normalized;
         PlasmaBolts projectile =
             Instantiate(
                 plasmaBoltPrefab,
                 activeFirePoint.position,
-                activeFirePoint.rotation
+                Quaternion.LookRotation(direction)
             );
 
         projectile.SetDamage(weaponDamage);
@@ -123,12 +125,13 @@ public class GruntCombat : EnemyCombat
 
             return;
         }
-
+        Vector3 targetPosition = currentTarget.position + Vector3.up * 10f;
+        Vector3 direction = (currentTarget.position - activeFirePoint.position).normalized;
         Needles projectile =
             Instantiate(
                 needleProjectilePrefab,
                 activeFirePoint.position,
-                activeFirePoint.rotation
+                Quaternion.LookRotation(direction)
             );
 
         projectile.SetDamage(weaponDamage);

@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using UnityEngine;
 
 public class PlasmaBolts : MonoBehaviour
@@ -28,14 +29,29 @@ public class PlasmaBolts : MonoBehaviour
     }
     private void Update()
     {
-        transform.position +=
+        Vector3 startPosition = transform.position;
+        Vector3 movement = transform.forward * speed 
+            * Time.deltaTime;
+        Vector3 endPosition = startPosition + movement;
+        RaycastHit hit;
+        if(Physics.Raycast(
+            startPosition,
+            transform.forward,
+            out hit,
+            movement.magnitude))
+        {
+            HandleHit(hit.collider);
+            return;
+        }
+        transform.position = endPosition;
+       /* transform.position +=
             transform.forward *
-            speed * Time.deltaTime;
+            speed * Time.deltaTime;*/
     }
 
  
 
-    private void OnTriggerEnter(Collider other)
+    private void HandleHit(Collider other)
     {
         Debug.Log(
             "Plasma bolt hit: " +
