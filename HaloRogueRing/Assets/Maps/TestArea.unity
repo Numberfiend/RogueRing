@@ -2160,6 +2160,18 @@ MonoBehaviour:
       Data4: 1614779443
     Path: event:/EnemyEvents/Elites/OnDamage
   damageSoundChance: 0.3
+--- !u!114 &527514173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 527514166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ef94d54b83852b41b224521959b30eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EliteAI
 --- !u!1001 &541017308
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3069,13 +3081,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc96bed081002eb4489afaead0ffe9a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GruntAI
-  startingAction: 8
-  sightRange: 20
-  sightAngle: 120
+  startingState: 2
+  searchRaidus: 20
+  visionCone: 120
   memoryDuration: 10
-  minFightTime: 3
-  maxFightTime: 5
-  turnSpeed: 60
+  wakeRadius: 15
+  eliteRetreatDistance: 50
+  searchTime: 5
+  searchAreaRadius: 10
+  searchPointWaitTime: 2
+  searchPointCount: 3
+  fleeAreaRadius: 20
+  fleeTime: 5
+  fleeDestinationTime: 2
+  fleeDecisionTime: 20
 --- !u!195 &794887126
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -3667,6 +3686,7 @@ GameObject:
   - component: {fileID: 881172712}
   - component: {fileID: 881172713}
   - component: {fileID: 881172714}
+  - component: {fileID: 881172715}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -3957,6 +3977,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb2286f3c3d42fa43bc2fa6941600809, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TempPlayerAudio
+--- !u!114 &881172715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 881172702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27708904af79f3346952241b86b4fde1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerGrenades
+  grenadeData: {fileID: 11400000, guid: 8a9f3772e5bc8464aa21d3cf725777a9, type: 2}
+  grenadeThrowPoint: {fileID: 1868653183}
+  throwForce: 15
+  upwardForce: 2
+  currentAmmo: 0
 --- !u!1 &889331586
 GameObject:
   m_ObjectHideFlags: 0
@@ -4163,6 +4200,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73c0eb60ca04cf248b6a6720c4cf276d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 527514172}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73c0eb60ca04cf248b6a6720c4cf276d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 527514173}
   m_SourcePrefab: {fileID: 100100000, guid: 73c0eb60ca04cf248b6a6720c4cf276d, type: 3}
 --- !u!1 &955549796 stripped
 GameObject:
@@ -4799,6 +4839,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fb6dc90a7a79967488841e0ef1c43932, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1135038129}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fb6dc90a7a79967488841e0ef1c43932, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1135038130}
   m_SourcePrefab: {fileID: 100100000, guid: fb6dc90a7a79967488841e0ef1c43932, type: 3}
 --- !u!1 &1135038123 stripped
 GameObject:
@@ -4924,6 +4967,18 @@ MonoBehaviour:
       Data4: 1614779443
     Path: event:/EnemyEvents/Elites/OnDamage
   damageSoundChance: 0.3
+--- !u!114 &1135038130
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1135038123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ef94d54b83852b41b224521959b30eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EliteAI
 --- !u!1001 &1150675155
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5155,13 +5210,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc96bed081002eb4489afaead0ffe9a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GruntAI
-  startingAction: 8
-  sightRange: 20
-  sightAngle: 120
+  startingState: 1
+  searchRaidus: 20
+  visionCone: 120
   memoryDuration: 10
-  minFightTime: 3
-  maxFightTime: 5
-  turnSpeed: 60
+  wakeRadius: 15
+  eliteRetreatDistance: 50
+  searchTime: 5
+  searchAreaRadius: 10
+  searchPointWaitTime: 2
+  searchPointCount: 3
+  fleeAreaRadius: 20
+  fleeTime: 5
+  fleeDestinationTime: 2
+  fleeDecisionTime: 20
 --- !u!195 &1150675165
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -6002,6 +6064,7 @@ Transform:
   m_Children:
   - {fileID: 1554565415}
   - {fileID: 254831183}
+  - {fileID: 1868653183}
   m_Father: {fileID: 1064262923}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1435675611
@@ -6910,6 +6973,37 @@ MonoBehaviour:
   batteryUI: {fileID: 1984573998}
   batteryText: {fileID: 1108584363}
   batterySlider: {fileID: 818067618}
+--- !u!1 &1868653182
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1868653183}
+  m_Layer: 0
+  m_Name: ThrowPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1868653183
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868653182}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.605, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1435675610}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1001 &1957955240
 PrefabInstance:
   m_ObjectHideFlags: 0

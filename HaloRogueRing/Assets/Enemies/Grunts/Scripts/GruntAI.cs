@@ -15,14 +15,36 @@ public class GruntAI : MonoBehaviour
 
     [SerializeField] private float searchRaidus = 20f;
     [SerializeField] private float visionCone = 120f;
-    [SerializeField] private float memoryDuration = 20f;
+    [SerializeField] private float memoryDuration = 5f;
+    [SerializeField] private float wakeRadius = 15f;
+    [SerializeField] private float eliteRetreatDistance = 50f;
     private Vector3 lastKnownPlayerPosition;
     private float lastSeenTime;
     [SerializeField] private float searchTime = 5f;
     private float searchTimer;
     private bool returningHome;
     private Transform player;
+    private float searchStartRotation;
+    
+    [SerializeField] private float searchAreaRadius = 10f;
+    private Vector3 searchDestination;
+    private bool hasSearchDestination;
+    [SerializeField] private float searchPointWaitTime = 2f;
 
+    private float searchPointTimer;
+    private bool suicideCharge;
+    [SerializeField] private int searchPointCount = 3;
+
+    private int currentSearchPoint;
+
+    [SerializeField] private float fleeAreaRadius = 20f;
+    [SerializeField] private float fleeTime = 5f;
+    [SerializeField] private float fleeDestinationTime = 2f;
+    
+    [SerializeField] private float fleeDecisionTime = 20f;
+    private float fleeDestinationTimer;
+    private float fleeDecisionTimer;
+    private float fleeTimer;
     private void Start()
     {
         homePosition = transform.position;
@@ -33,28 +55,57 @@ public class GruntAI : MonoBehaviour
     }
     private void Update()
     {
-        switch (currentState)
+        if (currentState != AiActions.Flee && !EliteNearby())
         {
-            case AiActions.Sleep:
-                Sleep();
-                break;
-            case AiActions.Wait:
-                Wait();
-                break;
-            case AiActions.Alert:
-                Alert();
-                break;
-            case AiActions.Fight:
-                Fight();
-                break;
-            case AiActions.Search:
-                Search();
-                break;
+            SetState(AiActions.Flee);
+            gruntCombat.StopFiring();
+            fleeDestinationTimer = 0f;
+            fleeDecisionTimer = fleeDestinationTime;
+            return;
+        }
+
+        switch (currentState)
+            {
+                case AiActions.Sleep:
+                    Sleep();
+                    break;
+                case AiActions.Wait:
+                    Wait();
+                    break;
+                case AiActions.Alert:
+                    Alert();
+                    break;
+                case AiActions.Fight:
+                    Fight();
+                    break;
+                case AiActions.Search:
+                    Search();
+                    break;
+                case AiActions.Flee:
+                     Flee();
+                    break;
+                case AiActions.Charge:
+                     Charge();
+                    break;
         }
     }
     private void Sleep()
     {
-
+        Collider[] nearbyObjects =
+            Physics.OverlapSphere(transform.position, wakeRadius);
+        foreach (Collider other in nearbyObjects)
+        {
+            GruntAI otherGrunt = other.GetComponentInParent<GruntAI>();
+            if (otherGrunt == null) continue;
+            if(otherGrunt == this) continue;
+            
+            if(otherGrunt.currentState == AiActions.Alert||
+                otherGrunt.currentState == AiActions.Fight)
+            {
+                SetState(AiActions.Alert);
+                return;
+            }
+        }
     }
     private void Wait()
     {
@@ -65,11 +116,20 @@ public class GruntAI : MonoBehaviour
     }
     private void Alert()
     {
-        RememberPlayer();
+        if (CanSeePlayer())
+        {
+            RememberPlayer();
+        }
         SetState(AiActions.Fight);
     }
     private void Fight()
     {
+        if (!EliteNearby())
+        {
+            gruntCombat.StopFiring();
+            SetState(AiActions.Flee);
+            return;
+        }
         if(CanSeePlayer())
         {
             RememberPlayer();
@@ -89,52 +149,201 @@ public class GruntAI : MonoBehaviour
             gruntCombat.StopFiring();
             if(Time.time - lastSeenTime >= memoryDuration)
             {
+                hasSearchDestination = false;
+                //searchStartRotation = transform.eulerAngles.y;
+                currentSearchPoint = 0;
+                searchTimer = 0f;
                 SetState(AiActions.Search);
             }
         }
     }
     private void Search()
     {
+        if (CanSeePlayer())
+        {
+            hasSearchDestination = false;
+            searchTimer = 0f;
+            returningHome = false;
+
+            agent.isStopped = true;
+
+            SetState(AiActions.Fight);
+
+            return;
+        }
         if (!returningHome)
         {
-            if (agent.remainingDistance > agent.stoppingDistance)
+            if (!hasSearchDestination)
             {
-                agent.SetDestination(lastKnownPlayerPosition);
+                if (currentSearchPoint >= searchPointCount)
+                {
+                    returningHome = true;
+                    agent.isStopped = false;
+                    agent.SetDestination(homePosition);
+
+                    Debug.Log(
+                        gameObject.name +
+                        " finished searching and is returning home."
+                    );
+
+                    return;
+                }
+
+                ChooseSearchPoint();
+
+                agent.isStopped = false;
+                agent.SetDestination(searchDestination);
+
+                currentSearchPoint++;
+
+                Debug.Log(
+                    gameObject.name +
+                    " searching point " +
+                    currentSearchPoint
+                );
+            }
+
+            if (!agent.pathPending &&
+                agent.remainingDistance <= agent.stoppingDistance)
+            {
+                agent.isStopped = true;
+
+                hasSearchDestination = false;
+            }
+
+            return;
+        }
+
+        if (!agent.pathPending &&
+            agent.remainingDistance <= agent.stoppingDistance)
+        {
+            returningHome = false;
+            hasSearchDestination = false;
+
+            if (startingState == AiActions.Sleep)
+            {
+                SetState(AiActions.Sleep);
+            }
+            else
+            {
+                SetState(AiActions.Wait);
+            }
+        }
+    }
+    private void Flee()
+    {
+        fleeDecisionTimer -= Time.deltaTime;
+
+        if (fleeDecisionTimer <= 0f)
+        {
+            fleeDecisionTimer = 0f;
+
+            if (Random.value < 0.5f)
+            {
+                // Continue fleeing
+                fleeDecisionTimer = fleeDecisionTime;
+            }
+            else
+            {
+                suicideCharge = Random.value < 0.5f;
+                SetState(AiActions.Charge);
                 return;
             }
-            agent.isStopped = true;
-            searchTimer += Time.deltaTime;
-            if (CanSeePlayer())
+        }
+
+        if (fleeDestinationTimer <= 0f)
+        {
+            fleeDestinationTimer = fleeDestinationTime;
+
+            Vector2 randomPoint =
+                Random.insideUnitCircle * fleeAreaRadius;
+
+            Vector3 randomPosition =
+                transform.position +
+                new Vector3(
+                    randomPoint.x,
+                    0f,
+                    randomPoint.y
+                );
+
+            NavMeshHit hit;
+
+            if (NavMesh.SamplePosition(
+                randomPosition,
+                out hit,
+                fleeAreaRadius,
+                NavMesh.AllAreas))
             {
-                searchTimer = 0f;
                 agent.isStopped = false;
-                SetState(AiActions.Fight);
-                return;
+                agent.SetDestination(hit.position);
             }
-            transform.Rotate(0f, 60f * Time.deltaTime, 0f);
-            if (searchTimer >= searchTime)
-            {
-                searchTimer = 0f;
-                returningHome = true;
-                agent.isStopped = false;
-                agent.SetDestination(homePosition);
-                Debug.Log(gameObject.name + " finsihing searching");
-            }
+        }
+
+        fleeDestinationTimer -= Time.deltaTime;
+    }
+    private void Charge()
+    {
+        Debug.Log(gameObject.name + " CHARGING!");
+        if (suicideCharge)
+        {
+            SuicideCharge();
         }
         else
         {
-          if(agent.remainingDistance <= agent.stoppingDistance)
+            StandGroundCharge();
+        }
+    }
+    private void StandGroundCharge()
+    {
+        if (player == null) return;
+        agent.isStopped = false;
+        agent.SetDestination(player.position);
+
+        if (CanSeePlayer())
+        {
+            Vector3 lookDirection = player.position - transform.position;
+            lookDirection.y = 0f;
+
+            if(lookDirection != Vector3.zero)
             {
-                returningHome = false;
-                if(startingState == AiActions.Sleep)
-                {
-                    SetState(AiActions.Sleep);
-                }
-                else
-                {
-                    SetState(AiActions.Wait);
-                }
+                Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+                transform.rotation =
+                    Quaternion.RotateTowards(
+                        transform.rotation,
+                        targetRotation,
+                        120f * Time.deltaTime
+                    );
             }
+            gruntCombat.SetTarget(player);
+            gruntCombat.StartFiring();
+        }
+    }
+    private void SuicideCharge()
+    {
+        if (player == null)
+            return;
+
+        gruntCombat.StopFiring();
+
+        agent.isStopped = false;
+        agent.SetDestination(player.position);
+
+        Vector3 lookDirection =
+            player.position - transform.position;
+
+        lookDirection.y = 0f;
+
+        if (lookDirection != Vector3.zero)
+        {
+            Quaternion targetRotation =
+                Quaternion.LookRotation(lookDirection);
+
+            transform.rotation =
+                Quaternion.RotateTowards(
+                    transform.rotation,
+                    targetRotation,
+                    180f * Time.deltaTime
+                );
         }
     }
     private bool PlayerInSearchRadius()
@@ -157,12 +366,54 @@ public class GruntAI : MonoBehaviour
         lastSeenTime = Time.time;
 
     }
+
+    private void ChooseSearchPoint()
+    {
+        Vector2 randomPoint =
+        Random.insideUnitCircle * searchAreaRadius;
+
+        Vector3 randomPosition =
+            lastKnownPlayerPosition +
+            new Vector3(
+                randomPoint.x,
+                0f,
+                randomPoint.y
+            );
+
+        NavMeshHit hit;
+
+        if (NavMesh.SamplePosition(
+            randomPosition,
+            out hit,
+            searchAreaRadius,
+            NavMesh.AllAreas))
+        {
+            searchDestination = hit.position;
+            hasSearchDestination = true;
+        }
+    }
     private void SetState(AiActions newState)
     {
         if(currentState == newState) return;
         Debug.Log(gameObject.name + " changed from " +
             currentState + " to " + newState);
         currentState = newState;
+    }
+    private bool EliteNearby()
+    {
+        Collider[] nearbyObjects =
+            Physics.OverlapSphere(
+                transform.position,
+                eliteRetreatDistance);
+        foreach (Collider other in nearbyObjects)
+        {
+            EliteAI elite = other.GetComponentInParent<EliteAI>();
+            if(elite != null)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
