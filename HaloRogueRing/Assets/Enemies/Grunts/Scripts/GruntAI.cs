@@ -5,6 +5,12 @@ using UnityEngine.Rendering;
 
 public class GruntAI : MonoBehaviour
 {
+    [Header("Suicide Charge")]
+    [SerializeField] private GrenadeData plasmaGrenadeData;
+    [SerializeField] private Transform leftHandGrenadePoint;
+    [SerializeField] private Transform rightHandGrenadePoint;
+    private bool suicideGrenadesSpawned;
+
     private GruntCombat gruntCombat;
     [SerializeField] private AiActions startingState = AiActions.Wait;
     private AiActions currentState;
@@ -55,12 +61,12 @@ public class GruntAI : MonoBehaviour
     }
     private void Update()
     {
-        if (currentState != AiActions.Flee && !EliteNearby())
+        if (currentState != AiActions.Flee && currentState!= AiActions.Charge && !EliteNearby())
         {
             SetState(AiActions.Flee);
             gruntCombat.StopFiring();
             fleeDestinationTimer = 0f;
-            fleeDecisionTimer = fleeDestinationTime;
+            fleeDecisionTimer = fleeDecisionTime;
             return;
         }
 
@@ -238,17 +244,9 @@ public class GruntAI : MonoBehaviour
         {
             fleeDecisionTimer = 0f;
 
-            if (Random.value < 0.5f)
-            {
-                // Continue fleeing
-                fleeDecisionTimer = fleeDecisionTime;
-            }
-            else
-            {
-                suicideCharge = Random.value < 0.5f;
-                SetState(AiActions.Charge);
-                return;
-            }
+            suicideCharge = true;
+            SetState(AiActions.Charge);
+            return;
         }
 
         if (fleeDestinationTimer <= 0f)
@@ -260,11 +258,7 @@ public class GruntAI : MonoBehaviour
 
             Vector3 randomPosition =
                 transform.position +
-                new Vector3(
-                    randomPoint.x,
-                    0f,
-                    randomPoint.y
-                );
+                new Vector3(randomPoint.x, 0f, randomPoint.y);
 
             NavMeshHit hit;
 
@@ -326,6 +320,12 @@ public class GruntAI : MonoBehaviour
 
         gruntCombat.StopFiring();
         gruntCombat.HideWeaponModel();
+
+        if (!suicideGrenadesSpawned)
+        {
+            SpawnSuicideGrenades();
+            suicideGrenadesSpawned = true;
+        }
 
         agent.isStopped = false;
         agent.SetDestination(player.position);
@@ -417,279 +417,67 @@ public class GruntAI : MonoBehaviour
         }
         return false;
     }
-}
-
-/*public class GruntAI : MonoBehaviour
-{
-    [Header("Starting State")]
-    [SerializeField] private AiActions startingAction = AiActions.Wait;
-
-    [SerializeField] private float sightRange = 20f;
-    [SerializeField] private float sightAngle = 120f;
-    private Transform player;
-
-    [Header("Memory")]
-    [SerializeField] private float memoryDuration = 10f;
-    private Vector3 lastKnownPlayerPosition;
-    private float lastSeenTime;
-    [Header("Combat")]
-    [SerializeField] private float minFightTime = 3f;
-    [SerializeField] private float maxFightTime = 5f;
-    [SerializeField] private float turnSpeed = 60f;
-    private float actionTimer;
-
-    private GruntCombat combatscript;
-    private NavMeshAgent agent;
-    private bool searchingForPlayer;
-    private float searchTurnDirection;
-    private Vector3 repositionPoint;
-    public AiActions CurrentAction
+    private void SpawnSuicideGrenades()
     {
-        get;
-        private set;
-    }
-    void Start()
-    {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-        agent = GetComponent<NavMeshAgent>();
-        combatscript = GetComponent<GruntCombat>();
-        CurrentAction = startingAction;   
-    }
-    private bool CanSeePlayer()
-    {
-        if(player == null) return false;
-        Vector3 direction = player.position - transform.position;
-        if(direction.magnitude > sightRange) return false;
-        float angle = Vector3.Angle(transform.forward,direction);
-        if(angle > sightAngle * 0.5f) return false;
-        return true;
-    }
-    private void RememberPlayer()
-    {
-        lastKnownPlayerPosition = player.position;
-        lastSeenTime = Time.time;
-    }
-    private bool HasPlayerMemory()
-    {
-        return Time.time - lastSeenTime < memoryDuration;
-    }
-    // Update is called once per frame
-    void Update()
-    {
-        UpdateAction();
-    }
-
-    public void SetActions(AiActions newAction)
-    {
-        if (CurrentAction == newAction) return;
-        Debug.Log(gameObject.name + " changed from " + CurrentAction + " to " + newAction);
-        CurrentAction = newAction;
-    }
-
-    private void UpdateAction()
-    {
-        switch (CurrentAction)
+        if (plasmaGrenadeData == null)
         {
-            case AiActions.Sleep:
-                Sleep();
-                break;
-            case AiActions.Alert:
-                Alert();
-                break;
-
-            case AiActions.Fight:
-                Fight();
-                break;
-            case AiActions.Uncover:
-                Uncover();
-                break;
-
-            case AiActions.Flee:
-                Flee();
-                break;
-
-            case AiActions.Search:
-                Search();
-                break;
-
-            case AiActions.Wait:
-                Wait();
-                break;
-            case AiActions.Guard:
-                Guard();
-                break;
-        }
-    }
-    private void Sleep()
-    {
-
-    }
-    private void Alert()
-    {
-        actionTimer = Random.Range(minFightTime, maxFightTime);
-        SetActions(AiActions.Fight);
-    }
-
-    private void Fight()
-    {
-        combatscript.StartFiring();
-
-        if (CanSeePlayer())
-        {
-            RememberPlayer();
-
-            Vector3 lookTarget = player.position;
-            lookTarget.y = transform.position.y;
-
-            Quaternion targetRotation = Quaternion.LookRotation(lookTarget - transform.position);
-
-            transform.rotation = Quaternion.RotateTowards(
-                transform.rotation,
-                targetRotation,
-                turnSpeed * Time.deltaTime);
-            
-
-            actionTimer -= Time.deltaTime;
-
-            if (actionTimer <= 0)
-            {
-                SetActions(AiActions.Uncover);
-            }
-
-            return;
-        }
-
-        combatscript.StopFiring();
-
-        searchingForPlayer = true;
-        actionTimer = 3f;
-        searchTurnDirection = Random.value < 0.5f ? -1f : 1f;
-        SetActions(AiActions.Search);
-    }
-
-    private void Flee()
-    {
-
-    }
-    private void Search()
-    {
-        combatscript.StopFiring();
-
-        if (CanSeePlayer())
-        {
-            SetActions(AiActions.Fight);
-            return;
-        }
-
-        if (!HasPlayerMemory())
-        {
-            searchingForPlayer = false;
-            SetActions(AiActions.Wait);
-            return;
-        }
-
-        agent.SetDestination(lastKnownPlayerPosition);
-
-        if (!agent.pathPending &&
-    agent.remainingDistance <= 1f)
-        {
-            agent.isStopped = true;
-
-            transform.Rotate(
-                Vector3.up,
-                turnSpeed * searchTurnDirection * Time.deltaTime
+            Debug.LogError(
+                gameObject.name +
+                " has no Plasma Grenade Data assigned.",
+                this
             );
 
-            actionTimer -= Time.deltaTime;
-
-            if (actionTimer <= 0f)
-            {
-                agent.isStopped = false;
-                searchingForPlayer = false;
-                SetActions(AiActions.Wait);
-            }
+            return;
         }
-    }
-    private void Wait()
-    {
-        combatscript.StopFiring();
-        transform.Rotate(
-        Vector3.up,
-        turnSpeed * Time.deltaTime);
 
-        if (CanSeePlayer())
+        SpawnGrenadeAtHand(leftHandGrenadePoint);
+        SpawnGrenadeAtHand(rightHandGrenadePoint);
+    }
+
+    private void SpawnGrenadeAtHand(Transform handPoint)
+    {
+        if (handPoint == null)
         {
-            SetActions(AiActions.Alert);
+            Debug.LogError(
+                gameObject.name +
+                " has a missing grenade hand point.",
+                this
+            );
+
+            return;
         }
-    }
-    private void Uncover()
-    {
-        combatscript.StopFiring();
-        PickRepositionPoint();
-        agent.SetDestination(repositionPoint);
-        SetActions(AiActions.Guard);
-    }
-    private void Guard()
-    {
-        if (agent.pathPending)
+
+        if (plasmaGrenadeData.worldPrefab == null)
+        {
+            Debug.LogError(
+                "Plasma Grenade Data has no World Prefab assigned.",
+                this
+            );
+
             return;
+        }
 
-        if (agent.remainingDistance > 1f)
+        GameObject grenadeObject = Instantiate(
+            plasmaGrenadeData.worldPrefab,
+            handPoint
+        );
+
+        grenadeObject.transform.localPosition = Vector3.zero;
+        grenadeObject.transform.localRotation = Quaternion.identity;
+
+        Grenade grenade = grenadeObject.GetComponent<Grenade>();
+
+        if (grenade == null)
+        {
+            Debug.LogError(
+                "Suicide grenade prefab has no Grenade component.",
+                grenadeObject
+            );
+
+            Destroy(grenadeObject);
             return;
+        }
 
-        actionTimer =
-            Random.Range(
-                minFightTime,
-                maxFightTime);
-
-        SetActions(AiActions.Fight);
+        grenade.Initialise(plasmaGrenadeData);
     }
-    private void PickRepositionPoint()
-    {
-        Vector3 directionFromPlayer =
-        (transform.position -
-         player.position).normalized;
-
-        Vector3 sideOffset =
-            Vector3.Cross(
-                Vector3.up,
-                directionFromPlayer) *
-            Random.Range(-5f, 5f);
-
-        Vector3 distanceOffset =
-            directionFromPlayer *
-            Random.Range(2f, 6f);
-
-        repositionPoint =
-            transform.position +
-            sideOffset +
-            distanceOffset;
-
-        Debug.Log(
-            gameObject.name +
-            " repositioning");
-    }
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, sightRange);
-
-        Vector3 leftBoundary =
-            Quaternion.Euler(0, -sightAngle * 0.5f, 0) *
-            transform.forward;
-
-        Vector3 rightBoundary =
-            Quaternion.Euler(0, sightAngle * 0.5f, 0) *
-            transform.forward;
-
-        Gizmos.color = Color.red;
-
-        Gizmos.DrawRay(
-            transform.position,
-            leftBoundary * sightRange);
-
-        Gizmos.DrawRay(
-            transform.position,
-            rightBoundary * sightRange);
-    }
-}*/
+}
