@@ -318,12 +318,14 @@ public class GruntAI : MonoBehaviour
             gruntCombat.StartFiring();
         }
     }
+   
     private void SuicideCharge()
     {
         if (player == null)
             return;
 
         gruntCombat.StopFiring();
+        gruntCombat.HideWeaponModel();
 
         agent.isStopped = false;
         agent.SetDestination(player.position);

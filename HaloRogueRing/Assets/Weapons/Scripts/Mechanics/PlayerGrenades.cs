@@ -5,18 +5,44 @@ using UnityEngine.InputSystem;
 public class PlayerGrenades : MonoBehaviour
 {
     [Header("Grenade Data")]
-    [SerializeField] private GrenadeData grenadeData;
+    [SerializeField] private GrenadeData humanFragData;
+    [SerializeField] private GrenadeData plasmaGrenadeData;
 
     [Header("Throwing")]
     [SerializeField] private Transform grenadeThrowPoint;
     [SerializeField] private float throwForce = 15f;
     [SerializeField] private float upwardForce = 2f;
 
-    [Header("Ammo")]
-    [SerializeField] private int currentAmmo;
+    [Header("Starting Ammo")]
+    [SerializeField] private int startingHumanFragAmmo = 4;
+    [SerializeField] private int startingPlasmaAmmo = 4;
+
+    private int currentHumanFragAmmo;
+    private int currentPlasmaAmmo;
+
+    private GrenadeData currentGrenadeData;
+    private bool usingPlasmaGrenade;
 
     private PlayerInput playerInput;
     private InputAction throwAction;
+    private InputAction switchGrenadeAction;
+
+    private int CurrentAmmo
+    {
+        get
+        {
+            return usingPlasmaGrenade
+                ? currentPlasmaAmmo
+                : currentHumanFragAmmo;
+        }
+        set
+        {
+            if (usingPlasmaGrenade)
+                currentPlasmaAmmo = value;
+            else
+                currentHumanFragAmmo = value;
+        }
+    }
 
     private void Awake()
     {
@@ -28,65 +54,106 @@ public class PlayerGrenades : MonoBehaviour
         if (playerInput == null)
             playerInput = GetComponent<PlayerInput>();
 
-        if (playerInput != null)
-        {
-            throwAction = playerInput.actions["Throw"];
+        if (playerInput == null)
+            return;
 
-            if (throwAction != null)
-                throwAction.performed += OnThrowPerformed;
-            else
-                Debug.LogError("PlayerGrenades: Throw action not found!", this);
-        }
+        throwAction = playerInput.actions["Throw"];
+        switchGrenadeAction = playerInput.actions["SwitchG"];
+
+        if (throwAction != null)
+            throwAction.performed += OnThrowPerformed;
+        else
+            Debug.LogError("PlayerGrenades: Throw action not found!", this);
+
+        if (switchGrenadeAction != null)
+            switchGrenadeAction.performed += OnSwitchGrenadePerformed;
+        else
+            Debug.LogError("PlayerGrenades: SwitchGrenade action not found!", this);
     }
 
     private void OnDisable()
     {
         if (throwAction != null)
             throwAction.performed -= OnThrowPerformed;
+
+        if (switchGrenadeAction != null)
+            switchGrenadeAction.performed -= OnSwitchGrenadePerformed;
     }
 
     private void Start()
     {
-        if (grenadeData == null)
-        {
-            Debug.LogError("PlayerGrenades: No Grenade Data assigned.", this);
-            enabled = false;
-            return;
-        }
+        currentHumanFragAmmo = Mathf.Max(0, startingHumanFragAmmo);
+        currentPlasmaAmmo = Mathf.Max(0, startingPlasmaAmmo);
 
-        currentAmmo = grenadeData.maxAmmo;
+        SelectGrenadeType();
 
-        Debug.Log("PlayerGrenades ready. Grenades: " + currentAmmo);
+        Debug.Log(
+            "Grenade inventory ready. M9: " +
+            currentHumanFragAmmo +
+            " | Plasma: " +
+            currentPlasmaAmmo
+        );
     }
 
     private void OnThrowPerformed(InputAction.CallbackContext context)
     {
-        Debug.Log("THROWiInG");
         ThrowGrenade();
+    }
+
+    private void OnSwitchGrenadePerformed(InputAction.CallbackContext context)
+    {
+        usingPlasmaGrenade = !usingPlasmaGrenade;
+
+        SelectGrenadeType();
+
+        Debug.Log(
+            "Selected grenade: " +
+            currentGrenadeData.grenadeName +
+            " | Ammo: " +
+            CurrentAmmo
+        );
+    }
+
+    private void SelectGrenadeType()
+    {
+        currentGrenadeData = usingPlasmaGrenade
+            ? plasmaGrenadeData
+            : humanFragData;
+
+        if (currentGrenadeData == null)
+        {
+            Debug.LogError("PlayerGrenades: Selected grenade data is missing.", this);
+        }
     }
 
     private void ThrowGrenade()
     {
-        if (currentAmmo <= 0)
+        if (currentGrenadeData == null)
         {
-            Debug.Log("No grenades remaining!");
+            Debug.LogWarning("No grenade data selected.");
             return;
         }
 
-        if (grenadeData.worldPrefab == null)
+        if (CurrentAmmo <= 0)
         {
-            Debug.LogError("PlayerGrenades: No grenade prefab assigned.", this);
+            Debug.Log("No grenades of this type remaining!");
+            return;
+        }
+
+        if (currentGrenadeData.worldPrefab == null)
+        {
+            Debug.LogError("Selected grenade has no World Prefab.", this);
             return;
         }
 
         if (grenadeThrowPoint == null)
         {
-            Debug.LogError("PlayerGrenades: No throw point assigned.", this);
+            Debug.LogError("No Grenade Throw Point assigned.", this);
             return;
         }
 
         GameObject grenadeObject = Instantiate(
-            grenadeData.worldPrefab,
+            currentGrenadeData.worldPrefab,
             grenadeThrowPoint.position,
             grenadeThrowPoint.rotation
         );
@@ -95,12 +162,12 @@ public class PlayerGrenades : MonoBehaviour
 
         if (grenade == null)
         {
-            Debug.LogError("The grenade prefab has no Grenade component.", grenadeObject);
+            Debug.LogError("Grenade prefab has no Grenade component.", grenadeObject);
             Destroy(grenadeObject);
             return;
         }
 
-        grenade.Initialise(grenadeData);
+        grenade.Initialise(currentGrenadeData);
 
         Vector3 throwDirection =
             grenadeThrowPoint.forward +
@@ -110,9 +177,26 @@ public class PlayerGrenades : MonoBehaviour
 
         grenade.Throw(throwDirection * throwForce);
 
-        currentAmmo--;
+        CurrentAmmo--;
 
-        Debug.Log("Grenades remaining: " + currentAmmo);
+        Debug.Log(
+            "Threw " + currentGrenadeData.grenadeName +
+            ". Remaining: " + CurrentAmmo
+        );
     }
 
+    public int GetHumanFragAmmo()
+    {
+        return currentHumanFragAmmo;
+    }
+
+    public int GetPlasmaAmmo()
+    {
+        return currentPlasmaAmmo;
+    }
+
+    public bool IsUsingPlasmaGrenade()
+    {
+        return usingPlasmaGrenade;
+    }
 }

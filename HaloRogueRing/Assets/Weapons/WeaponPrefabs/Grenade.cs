@@ -24,6 +24,10 @@ public class Grenade : MonoBehaviour
     private const float RestSpeed = 0.15f;
     private const float RestCheckDelay = 0.1f;
 
+    private bool isGrounded;
+    private float groundTime;
+
+    [SerializeField] private float groundDrag = 4f;
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -45,6 +49,37 @@ public class Grenade : MonoBehaviour
         rb.isKinematic = false;
         rb.AddForce(force, ForceMode.Impulse);
     }
+
+    private void FixedUpdate()
+    {
+        if (!hasBeenThrown || hasExploded)
+            return;
+
+        if (isGrounded)
+        {
+            Vector3 velocity = rb.linearVelocity;
+
+            // Preserve vertical velocity but slow horizontal movement.
+            Vector3 horizontalVelocity = new Vector3(
+                velocity.x,
+                0f,
+                velocity.z
+            );
+
+            horizontalVelocity = Vector3.Lerp(
+                horizontalVelocity,
+                Vector3.zero,
+                groundDrag * Time.fixedDeltaTime
+            );
+
+            rb.linearVelocity = new Vector3(
+                horizontalVelocity.x,
+                velocity.y,
+                horizontalVelocity.z
+            );
+        }
+    }
+
 
     private void Update()
     {
@@ -141,9 +176,16 @@ public class Grenade : MonoBehaviour
         stuckLocalRotation =
             Quaternion.Inverse(target.rotation) * transform.rotation;
 
+        // Stop the grenade's physics movement.
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.isKinematic = true;
+
+        // Prevent the attached grenade from colliding with the character.
+        Collider grenadeCollider = GetComponent<Collider>();
+
+        if (grenadeCollider != null)
+            grenadeCollider.enabled = false;
 
         transform.SetParent(target, true);
     }
@@ -209,6 +251,30 @@ public class Grenade : MonoBehaviour
             grenadeData.minDamage,
             distancePercent
         );
+    }
+    private void OnCollisionStay(Collision collision)
+    {
+        if (!hasBeenThrown || hasExploded)
+            return;
+
+        if (collision.contacts.Length == 0)
+            return;
+
+        foreach (ContactPoint contact in collision.contacts)
+        {
+            if (contact.normal.y > 0.5f)
+            {
+                isGrounded = true;
+                return;
+            }
+        }
+
+        isGrounded = false;
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        isGrounded = false;
     }
 }
 

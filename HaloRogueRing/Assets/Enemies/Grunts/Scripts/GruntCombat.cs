@@ -165,5 +165,13 @@ public class GruntCombat : EnemyCombat
     {
         return weaponDamage;
     }
+    public void HideWeaponModel()
+    {
+        if (plasmaPistolModel != null)
+            plasmaPistolModel.SetActive(false);
+
+        if (needlerModel != null)
+            needlerModel.SetActive(false);
+    }
 }
 

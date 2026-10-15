@@ -22,4 +22,4 @@ MonoBehaviour:
   minTimeAfterThrow: 1.5
   timeAfterRest: 0.5
   plasmaFuseTime: 3
-  worldPrefab: {fileID: 0}
+  worldPrefab: {fileID: 1073202201768746590, guid: f47264123e03baa4f8eb4ef8e6511a74, type: 3}

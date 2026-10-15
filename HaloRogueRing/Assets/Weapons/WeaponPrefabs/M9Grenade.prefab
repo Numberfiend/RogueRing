@@ -100,7 +100,7 @@ SphereCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1073202201768746590}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 0d5688f7bad06154b8af60526eca6f64, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -154,4 +154,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Grenade
   grenadeData: {fileID: 11400000, guid: 8a9f3772e5bc8464aa21d3cf725777a9, type: 2}
-  hasExploded: 1
+  groundDrag: 2
