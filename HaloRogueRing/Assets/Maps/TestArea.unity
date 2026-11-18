@@ -2234,6 +2234,94 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ef94d54b83852b41b224521959b30eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EliteAI
+  startingState: 0
+  sightRange: 30
+  visionCone: 150
+  eyeHeight: 1.7
+  targetHeight: 1
+  lineOfSightMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  memoryDuration: 12
+  commandRadius: 50
+  squadAlertRadius: 45
+  alertDuration: 1
+  turnSpeed: 180
+  combatRepathInterval: 0.3
+  supportCombatRange: 18
+  soloCombatRange: 10
+  minCombatRange: 7
+  maxCombatRange: 22
+  retreatDistance: 25
+  retreatRepathInterval: 1
+  retreatFireInterval: 1.5
+  retreatFireDuration: 0.6
+  retreatCandidateCount: 6
+  minPlayerPassDistance: 4
+  shieldRecoveryThreshold: 0.25
+  searchRadius: 12
+  searchWaitTime: 3
+  searchPointCount: 3
+  searchScanSpeed: 45
+--- !u!114 &527514174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 527514166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6e10e33941f54347bf9797675826304, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EliteCombat
+  enemyData: {fileID: 11400000, guid: 7c826d43bbb9d9043aa76c7ceaa062a3, type: 2}
+  activeWeaponIndex: 0
+  weaponDropPoint: {fileID: 230206711}
+  plasmaRifleModel: {fileID: 170725517}
+  needlerModel: {fileID: 541017311}
+  plasmaRifleFirePoint: {fileID: 170725516}
+  needlerFirePoint: {fileID: 541017309}
+  plasmaBoltPrefab: {fileID: 3228647246585718338, guid: a268e7fafd731e042944aca31085016a, type: 3}
+  needleProjectilePrefab: {fileID: -3772415414098356877, guid: 5c2923e800607c44aab08317e5d5d948, type: 3}
+  fireRate: 1
+--- !u!114 &527514175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 527514166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e23dc80ffd3e5b42be618026472773b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  enemyData: {fileID: 11400000, guid: 7c826d43bbb9d9043aa76c7ceaa062a3, type: 2}
+  shieldRechargeDelay: 5
+  shieldRechargeRate: 25
+--- !u!195 &527514176
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 527514166}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1001 &541017308
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3146,20 +3234,41 @@ MonoBehaviour:
   plasmaGrenadeData: {fileID: 11400000, guid: fa94cbffe6e12de449f31f7818399f98, type: 2}
   leftHandGrenadePoint: {fileID: 113440631}
   rightHandGrenadePoint: {fileID: 1981635347}
+  chargeSpeedMultiplier: 1.6
+  chargeRepathInterval: 0.2
+  commandSearchRadius: 50
+  commandSearchInterval: 1
   startingState: 2
-  searchRaidus: 20
+  sightRange: 20
   visionCone: 120
+  eyeHeight: 1.4
+  targetHeight: 1
+  lineOfSightMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
   memoryDuration: 10
   wakeRadius: 15
-  eliteRetreatDistance: 50
-  searchTime: 5
+  alertDuration: 1
+  alertTurnSpeed: 120
+  combatTurnSpeed: 150
+  minCombatRange: 6
+  maxCombatRange: 14
+  preferredCombatRange: 10
+  combatRepathInterval: 0.3
+  repositionIntervalMin: 3
+  repositionIntervalMax: 6
+  firingPositionCandidates: 8
+  firingPositionSeparation: 3
   searchAreaRadius: 10
-  searchPointWaitTime: 2
   searchPointCount: 3
+  searchPointWaitTime: 2
+  searchScanSpeed: 45
   fleeAreaRadius: 20
   fleeTime: 5
   fleeDestinationTime: 2
-  fleeDecisionTime: 20
+  suicideChance: 0.1
+  fleeCandidateCount: 6
+  minPlayerPassDistance: 4
 --- !u!195 &794887126
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -4301,6 +4410,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73c0eb60ca04cf248b6a6720c4cf276d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 527514173}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73c0eb60ca04cf248b6a6720c4cf276d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 527514176}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73c0eb60ca04cf248b6a6720c4cf276d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 527514175}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 73c0eb60ca04cf248b6a6720c4cf276d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 527514174}
   m_SourcePrefab: {fileID: 100100000, guid: 73c0eb60ca04cf248b6a6720c4cf276d, type: 3}
 --- !u!1 &955549796 stripped
 GameObject:
@@ -4940,6 +5058,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fb6dc90a7a79967488841e0ef1c43932, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1135038130}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fb6dc90a7a79967488841e0ef1c43932, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1135038133}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fb6dc90a7a79967488841e0ef1c43932, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1135038132}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: fb6dc90a7a79967488841e0ef1c43932, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1135038131}
   m_SourcePrefab: {fileID: 100100000, guid: fb6dc90a7a79967488841e0ef1c43932, type: 3}
 --- !u!1 &1135038123 stripped
 GameObject:
@@ -5077,6 +5204,94 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ef94d54b83852b41b224521959b30eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EliteAI
+  startingState: 0
+  sightRange: 30
+  visionCone: 150
+  eyeHeight: 1.7
+  targetHeight: 1
+  lineOfSightMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  memoryDuration: 12
+  commandRadius: 50
+  squadAlertRadius: 45
+  alertDuration: 1
+  turnSpeed: 180
+  combatRepathInterval: 0.3
+  supportCombatRange: 18
+  soloCombatRange: 10
+  minCombatRange: 7
+  maxCombatRange: 22
+  retreatDistance: 25
+  retreatRepathInterval: 1
+  retreatFireInterval: 1.5
+  retreatFireDuration: 0.6
+  retreatCandidateCount: 6
+  minPlayerPassDistance: 4
+  shieldRecoveryThreshold: 0.25
+  searchRadius: 12
+  searchWaitTime: 3
+  searchPointCount: 3
+  searchScanSpeed: 45
+--- !u!114 &1135038131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1135038123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6e10e33941f54347bf9797675826304, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EliteCombat
+  enemyData: {fileID: 11400000, guid: aea2ca4b89420e7498c62f024a6ef742, type: 2}
+  activeWeaponIndex: 0
+  weaponDropPoint: {fileID: 793684184}
+  plasmaRifleModel: {fileID: 1351669553}
+  needlerModel: {fileID: 1074059438}
+  plasmaRifleFirePoint: {fileID: 1351669552}
+  needlerFirePoint: {fileID: 1074059436}
+  plasmaBoltPrefab: {fileID: 3228647246585718338, guid: a268e7fafd731e042944aca31085016a, type: 3}
+  needleProjectilePrefab: {fileID: -3772415414098356877, guid: 5c2923e800607c44aab08317e5d5d948, type: 3}
+  fireRate: 1
+--- !u!114 &1135038132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1135038123}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e23dc80ffd3e5b42be618026472773b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  enemyData: {fileID: 11400000, guid: aea2ca4b89420e7498c62f024a6ef742, type: 2}
+  shieldRechargeDelay: 5
+  shieldRechargeRate: 25
+--- !u!195 &1135038133
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1135038123}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1001 &1150675155
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5311,20 +5526,41 @@ MonoBehaviour:
   plasmaGrenadeData: {fileID: 11400000, guid: fa94cbffe6e12de449f31f7818399f98, type: 2}
   leftHandGrenadePoint: {fileID: 62525487}
   rightHandGrenadePoint: {fileID: 908353230}
+  chargeSpeedMultiplier: 1.6
+  chargeRepathInterval: 0.2
+  commandSearchRadius: 50
+  commandSearchInterval: 1
   startingState: 1
-  searchRaidus: 20
+  sightRange: 20
   visionCone: 120
+  eyeHeight: 1.4
+  targetHeight: 1
+  lineOfSightMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
   memoryDuration: 10
   wakeRadius: 15
-  eliteRetreatDistance: 50
-  searchTime: 5
+  alertDuration: 1
+  alertTurnSpeed: 120
+  combatTurnSpeed: 150
+  minCombatRange: 6
+  maxCombatRange: 14
+  preferredCombatRange: 10
+  combatRepathInterval: 0.3
+  repositionIntervalMin: 3
+  repositionIntervalMax: 6
+  firingPositionCandidates: 8
+  firingPositionSeparation: 3
   searchAreaRadius: 10
-  searchPointWaitTime: 2
   searchPointCount: 3
+  searchPointWaitTime: 2
+  searchScanSpeed: 45
   fleeAreaRadius: 20
   fleeTime: 5
   fleeDestinationTime: 2
-  fleeDecisionTime: 20
+  suicideChance: 0.1
+  fleeCandidateCount: 6
+  minPlayerPassDistance: 4
 --- !u!195 &1150675165
 NavMeshAgent:
   m_ObjectHideFlags: 0

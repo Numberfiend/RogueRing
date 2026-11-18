@@ -19,12 +19,14 @@ public class EliteCombat : EnemyCombat
 
     private float weaponDamage;
 
+    private float normalFireRate;
     protected override void Start()
     {
         base.Start();
 
         SetWeaponDamage();
         SetActiveFirePoint();
+        normalFireRate = fireRate;
     }
 
     private void SetWeaponDamage()
@@ -101,6 +103,11 @@ public class EliteCombat : EnemyCombat
         nextFireTime =
             Time.time +
             (1f / fireRate);
+    }
+
+    public void SetBerserkFireRate(float newFireRate)
+    {
+        fireRate = newFireRate;
     }
 
     private void FirePlasmaRifle()
