@@ -1,9 +1,25 @@
 using UnityEngine;
-using UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Rigidbody), typeof(Collider))]
 public class Grenade : MonoBehaviour
 {
+    private static readonly List<Grenade> activeGrenades = new List<Grenade>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics() => activeGrenades.Clear();
+
+    private bool isCarried;
+
+    public bool IsLive => hasBeenThrown && !hasExploded && !isCarried;
+    public float ExplosionRadius => grenadeData != null ? grenadeData.explosionRadius : 0f;
+    public Transform StuckTarget => isStuck ? stuckTarget : null;
+
+    private void OnEnable() => activeGrenades.Add(this);
+    private void OnDisable() => activeGrenades.Remove(this);
+
+    
+    
     [Header("Grenade Data")]
     [SerializeField] private GrenadeData grenadeData;
 
@@ -59,7 +75,6 @@ public class Grenade : MonoBehaviour
         {
             Vector3 velocity = rb.linearVelocity;
 
-            // Preserve vertical velocity but slow horizontal movement.
             Vector3 horizontalVelocity = new Vector3(
                 velocity.x,
                 0f,
@@ -152,7 +167,6 @@ public class Grenade : MonoBehaviour
         hasCollided = true;
         collisionTime = Time.time;
 
-        // Stick to characters that have health components.
         PlayerHealth playerHealth =
             collision.collider.GetComponentInParent<PlayerHealth>();
 
@@ -176,12 +190,11 @@ public class Grenade : MonoBehaviour
         stuckLocalRotation =
             Quaternion.Inverse(target.rotation) * transform.rotation;
 
-        // Stop the grenade's physics movement.
+        
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.isKinematic = true;
 
-        // Prevent the attached grenade from colliding with the character.
         Collider grenadeCollider = GetComponent<Collider>();
 
         if (grenadeCollider != null)
@@ -202,32 +215,22 @@ public class Grenade : MonoBehaviour
             grenadeData.explosionRadius
         );
 
+        HashSet<PlayerHealth> damagedPlayers = new HashSet<PlayerHealth>();
+        HashSet<EnemyHealth> damagedEnemies = new HashSet<EnemyHealth>();
+
         foreach (Collider hitCollider in hitColliders)
         {
-            PlayerHealth playerHealth =
-                hitCollider.GetComponentInParent<PlayerHealth>();
-
+            PlayerHealth playerHealth = hitCollider.GetComponentInParent<PlayerHealth>();
             if (playerHealth != null)
             {
-                float damage = CalculateDamage(
-                    playerHealth.transform.position
-                );
-
-                playerHealth.TakeDamage(damage);
+                if (damagedPlayers.Add(playerHealth))
+                    playerHealth.TakeDamage(CalculateDamage(playerHealth.transform.position));
                 continue;
             }
 
-            EnemyHealth enemyHealth =
-                hitCollider.GetComponentInParent<EnemyHealth>();
-
-            if (enemyHealth != null)
-            {
-                float damage = CalculateDamage(
-                    enemyHealth.transform.position
-                );
-
-                enemyHealth.TakeDamage(damage);
-            }
+            EnemyHealth enemyHealth = hitCollider.GetComponentInParent<EnemyHealth>();
+            if (enemyHealth != null && damagedEnemies.Add(enemyHealth))
+                enemyHealth.TakeDamage(CalculateDamage(enemyHealth.transform.position));
         }
 
         Debug.Log(grenadeData.grenadeName + " exploded!");
@@ -276,5 +279,55 @@ public class Grenade : MonoBehaviour
     {
         isGrounded = false;
     }
+
+    public static Grenade FindThreat(Vector3 position, float margin, Transform ignoreStuckTo)
+    {
+        Grenade nearest = null;
+        float nearestSqr = float.MaxValue;
+
+        for (int i = 0; i < activeGrenades.Count; i++)
+        {
+            Grenade g = activeGrenades[i];
+            if (g == null || !g.IsLive) continue;
+
+            
+            if (ignoreStuckTo != null && g.StuckTarget != null &&
+                g.StuckTarget.root == ignoreStuckTo.root)
+                continue;
+
+            float range = g.ExplosionRadius + margin;
+            float sqr = (g.transform.position - position).sqrMagnitude;
+            if (sqr <= range * range && sqr < nearestSqr)
+            {
+                nearest = g;
+                nearestSqr = sqr;
+            }
+        }
+        return nearest;
+    }
+
+    public void ThrowWithVelocity(Vector3 velocity)
+    {
+        if (rb == null) rb = GetComponent<Rigidbody>();
+
+        hasBeenThrown = true;
+        throwTime = Time.time;
+
+        rb.isKinematic = false;
+        rb.linearVelocity = velocity;
+    }
+
+    
+    public void PrepareAsCarried()
+    {
+        isCarried = true;
+        if (rb == null) rb = GetComponent<Rigidbody>();
+        rb.isKinematic = true;
+
+        Collider col = GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+    }
+
+    public void Detonate() => Explode();
 }
 

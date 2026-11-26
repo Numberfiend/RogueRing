@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UI;
+
 
 public class EliteAI : MonoBehaviour
 {
@@ -34,30 +34,45 @@ public class EliteAI : MonoBehaviour
     [SerializeField] private float alertDuration = 1f;
     [SerializeField] private float turnSpeed = 180f;
     [SerializeField] private float combatRepathInterval = 0.3f;
-    [Tooltip("Preferred range when commanded Grunts are alive.")]
     [SerializeField] private float supportCombatRange = 18f;
-    [Tooltip("Preferred range when fighting without Grunts.")]
     [SerializeField] private float soloCombatRange = 10f;
     [SerializeField] private float minCombatRange = 7f;
     [SerializeField] private float maxCombatRange = 22f;
 
+    [Header("Evasion")]
+    [SerializeField] private float strafeDistance = 4f;
+    [SerializeField] private float strafeIntervalMin = 2f;
+    [SerializeField] private float strafeIntervalMax = 4f;
+
     [Header("Retreat")]
     [SerializeField] private float retreatDistance = 25f;
     [SerializeField] private float retreatRepathInterval = 1f;
-    [Tooltip("How often the Elite pauses to fire back while retreating.")]
     [SerializeField] private float retreatFireInterval = 1.5f;
-    [Tooltip("How long each return-fire burst lasts.")]
     [SerializeField] private float retreatFireDuration = 0.6f;
     [SerializeField] private int retreatCandidateCount = 6;
     [SerializeField] private float minPlayerPassDistance = 4f;
-    [Tooltip("Shield fraction (0-1) the Elite must recover before it re-engages.")]
     [SerializeField] private float shieldRecoveryThreshold = 0.25f;
+
+    [Header("Cover")]
+    [SerializeField] private float coverSearchRadius = 20f;
+    [SerializeField] private int coverCandidateCount = 16;
+    [SerializeField] private float minCoverDistance = 8f;
 
     [Header("Search")]
     [SerializeField] private float searchRadius = 12f;
     [SerializeField] private float searchWaitTime = 3f;
     [SerializeField] private int searchPointCount = 3;
     [SerializeField] private float searchScanSpeed = 45f;
+
+    private EnemyGrenadeThrower grenadeThrower;
+
+    [Header("Grenade Avoidance")]
+    [SerializeField] private float grenadeAvoidMargin = 2f;
+    [SerializeField] private float grenadeCheckInterval = 0.2f;
+    private Grenade threatGrenade;
+    private bool avoidingGrenade;
+    private float grenadeCheckTimer;
+    private float avoidRepathTimer;
 
     private NavMeshAgent agent;
     private EnemyHealth enemyHealth;
@@ -72,7 +87,7 @@ public class EliteAI : MonoBehaviour
     private float lastSeenTime;
     private float alertTimer;
     private float combatTimer;
-
+    private float strafeTimer;
     
     private int commandedGruntCount;
     private float commandCountTimer;
@@ -81,6 +96,8 @@ public class EliteAI : MonoBehaviour
     private float retreatTimer;
     private float retreatFireTimer;
     private float retreatFireUntil;
+    private Vector3 coverPoint;
+    private bool hasCoverPoint;
 
     
     private SearchPhase searchPhase;
@@ -97,6 +114,8 @@ public class EliteAI : MonoBehaviour
 
         if (agent != null)
             baseSpeed = agent.speed;
+
+        grenadeThrower = GetComponent<EnemyGrenadeThrower>();
     }
 
     private void OnEnable()
@@ -145,6 +164,7 @@ public class EliteAI : MonoBehaviour
         }
 
         RefreshCommandCount();
+        if (UpdateGrenadeAvoidance()) return;
         UpdateShieldState();
 
         switch (currentState)
@@ -183,7 +203,8 @@ public class EliteAI : MonoBehaviour
         {
             if (enemyHealth.ShieldPercentage >= shieldRecoveryThreshold)
             {
-                lastSeenTime = Time.time; 
+                //lastSeenTime = Time.time; 
+                RememberPlayer();
                 SetState(EliteState.Fight);
             }
         }
@@ -206,9 +227,10 @@ public class EliteAI : MonoBehaviour
 
     private void EnterState(EliteState state)
     {
-        agent.speed = baseSpeed;
+        if (state != EliteState.Fight && grenadeThrower != null)
+            grenadeThrower.CancelThrow();
 
-        
+        agent.speed = baseSpeed;
         agent.updateRotation =
             state != EliteState.Alert &&
             state != EliteState.Fight &&
@@ -229,6 +251,7 @@ public class EliteAI : MonoBehaviour
 
             case EliteState.Fight:
                 combatTimer = 0f;
+                strafeTimer = Random.Range(strafeIntervalMin, strafeIntervalMax);
                 agent.isStopped = false;
                 break;
 
@@ -246,6 +269,7 @@ public class EliteAI : MonoBehaviour
                 retreatTimer = 0f;
                 retreatFireTimer = 0f;
                 retreatFireUntil = 0f;
+                hasCoverPoint = false;
                 agent.isStopped = false;
                 break;
         }
@@ -281,7 +305,22 @@ public class EliteAI : MonoBehaviour
     {
         combatTimer -= Time.deltaTime;
 
-        if (CanSeePlayer(true))
+        bool canSee = CanSeePlayer(true);
+
+        if (grenadeThrower != null)
+        {
+            if (grenadeThrower.IsThrowing)
+            {
+                agent.isStopped = true;
+                eliteCombat.StopFiring();
+                FaceTowards(grenadeThrower.PendingTarget, turnSpeed);
+                return;
+            }
+
+            grenadeThrower.Evaluate(player, canSee, lastKnownPlayerPosition, lastSeenTime);
+        }
+
+        if (canSee)
         {
             RememberPlayer();
 
@@ -318,7 +357,10 @@ public class EliteAI : MonoBehaviour
 
         if (inGoodRange)
         {
-            agent.isStopped = true;
+            strafeTimer -= Time.deltaTime;
+            if (strafeTimer <= 0f) TryStrafe();
+            else if (AINavigation.HasArrived(agent))
+                agent.isStopped = true;
             return;
         }
 
@@ -327,6 +369,29 @@ public class EliteAI : MonoBehaviour
 
         Vector3 direction = distance > 0.01f ? fromPlayer / distance : transform.forward;
         MoveTo(player.position + direction * preferredRange);
+    }
+
+    private void TryStrafe()
+    {
+        strafeTimer = Random.Range(strafeIntervalMin, strafeIntervalMax);
+        Vector3 toPlayer = player.position - transform.position;
+        toPlayer.y = 0f;
+        if (toPlayer.sqrMagnitude < 0.01f) return;
+
+        Vector3 right = Vector3.Cross(Vector3.up, toPlayer.normalized);
+        float side = Random.value < 0.5f ? -1f : 1f;
+
+        for (int attempt = 0; attempt <2; attempt++)
+        {
+            Vector3 target = transform.position + right * side * strafeDistance;
+            if(NavMesh.SamplePosition(target, out NavMeshHit hit, 1.5f, NavMesh.AllAreas))
+            {
+                agent.isStopped = false;
+                agent.SetDestination(hit.position);
+                return;
+            }
+            side = -side;
+        }
     }
 
     private void ChaseLastKnownPosition()
@@ -355,19 +420,71 @@ public class EliteAI : MonoBehaviour
     private void Retreat()
     {
         retreatTimer -= Time.deltaTime;
-        retreatFireTimer -= Time.deltaTime;
-
-        
         FaceTowards(player.position, turnSpeed);
+        UpdateReturnFire();
 
-        
-        if (retreatFireTimer <= 0f)
+        if (retreatTimer > 0f) return;
+        retreatTimer = retreatRepathInterval;
+
+        if (hasCoverPoint)
+        {
+            if (IsHiddenAt(coverPoint))
+            {
+                if (AINavigation.HasArrived(agent))
+                    agent.isStopped = true;
+                return;
+            }
+            hasCoverPoint = false;
+        }
+
+        if (IsHiddenAt(transform.position))
+        {
+            agent.isStopped = true;
+            return;
+        }
+
+        Vector3 destination;
+
+        if (AINavigation.TryPickCover(
+            transform.position, player, coverSearchRadius, coverCandidateCount,
+            eyeHeight, targetHeight, lineOfSightMask, transform,
+            minPlayerPassDistance, minCoverDistance, out destination))
+        {
+            coverPoint = destination;
+            hasCoverPoint = true;
+            agent.isStopped = false;
+            agent.SetDestination(destination);
+        }
+        else if (AINavigation.TryPickPointAwayFrom(
+                transform.position, player.position, retreatDistance,
+                retreatCandidateCount, minPlayerPassDistance, out destination))
+        {
+            agent.isStopped = false;
+            agent.SetDestination(destination);
+        }
+        else
+        {
+            agent.isStopped = true;
+            retreatFireUntil = Time.time + retreatRepathInterval;
+        }
+    }
+
+    private bool IsHiddenAt(Vector3 position)
+    {
+        return AINavigation.IsHiddenFrom(
+            position, eyeHeight, player, targetHeight, lineOfSightMask, transform);
+    }
+
+    private void UpdateReturnFire()
+    {
+        retreatFireTimer -= Time.deltaTime;
+        if(retreatFireTimer <= 0f)
         {
             retreatFireTimer = retreatFireInterval;
             retreatFireUntil = Time.time + retreatFireDuration;
         }
 
-        if (Time.time < retreatFireUntil && CanSeePlayer(true))
+        if(Time.time < retreatFireUntil && CanSeePlayer(true))
         {
             eliteCombat.SetTarget(player);
             eliteCombat.StartFiring();
@@ -376,26 +493,8 @@ public class EliteAI : MonoBehaviour
         {
             eliteCombat.StopFiring();
         }
-
-        if (retreatTimer > 0f) return;
-        retreatTimer = retreatRepathInterval;
-
-        if (AINavigation.TryPickPointAwayFrom(
-                transform.position, player.position, retreatDistance,
-                retreatCandidateCount, minPlayerPassDistance, out Vector3 destination))
-        {
-            agent.isStopped = false;
-            agent.SetDestination(destination);
-        }
-        else
-        {
-           
-            agent.isStopped = true;
-            retreatFireUntil = Time.time + retreatRepathInterval;
-        }
     }
 
-    
 
     private void Search()
     {
@@ -488,6 +587,7 @@ public class EliteAI : MonoBehaviour
         }
 
         commandedGruntCount = count;
+        //if (UpdateGrenadeAvoidance()) return;
     }
 
     private void BroadcastPlayerLocation()
@@ -581,4 +681,62 @@ public class EliteAI : MonoBehaviour
     {
         AINavigation.FaceTowards(transform, worldPosition, degreesPerSecond);
     }
+
+    private bool UpdateGrenadeAvoidance()
+    {
+        if (currentState == EliteState.Wait)
+        {
+            if (avoidingGrenade) StopAvoidingGrenade();
+            return false;
+        }
+
+        grenadeCheckTimer -= Time.deltaTime;
+        if (grenadeCheckTimer <= 0f)
+        {
+            grenadeCheckTimer = grenadeCheckInterval;
+            threatGrenade = Grenade.FindThreat(transform.position, grenadeAvoidMargin, transform);
+        }
+
+        if (threatGrenade == null)
+        {
+            if (avoidingGrenade) StopAvoidingGrenade();
+            return false;
+        }
+
+        if (!avoidingGrenade)
+        {
+            avoidingGrenade = true;
+            eliteCombat.StopFiring();
+            if (grenadeThrower != null) grenadeThrower.CancelThrow();
+            agent.updateRotation = true;
+            avoidRepathTimer = 0f;
+        }
+
+        avoidRepathTimer -= Time.deltaTime;
+        if (avoidRepathTimer <= 0f)
+        {
+            avoidRepathTimer = 0.4f;
+            float runDistance = threatGrenade.ExplosionRadius + grenadeAvoidMargin + 2f;
+
+            if (AINavigation.TryPickPointAwayFrom(
+                    transform.position, threatGrenade.transform.position,
+                    runDistance, 6, 1.5f, out Vector3 destination))
+            {
+                agent.isStopped = false;
+                agent.SetDestination(destination);
+            }
+        }
+        return true;
+    }
+
+    private void StopAvoidingGrenade()
+    {
+        avoidingGrenade = false;
+        threatGrenade = null;
+        agent.updateRotation =
+            currentState != EliteState.Alert &&
+            currentState != EliteState.Fight &&
+            currentState != EliteState.Retreat;
+    }
+
 }

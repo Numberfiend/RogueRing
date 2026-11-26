@@ -16,6 +16,8 @@ public class EnemyHealth : MonoBehaviour
     private float shieldRechargeTimer;
     private bool isDead;
 
+    public event System.Action Died;
+
     private void Start()
     {
         enemyAudio = GetComponent<CommonEnemyAudio>();
@@ -40,7 +42,7 @@ public class EnemyHealth : MonoBehaviour
         if (isDead || damage <= 0f)
             return;
 
-        // Reset the recharge delay whenever damage is received.
+   
         shieldRechargeTimer = shieldRechargeDelay;
 
         if (currentShield > 0f)
@@ -91,6 +93,7 @@ public class EnemyHealth : MonoBehaviour
             return;
 
         isDead = true;
+        Died?.Invoke();
 
         if (enemyAudio != null)
             enemyAudio.OnDeath();

@@ -24,7 +24,6 @@ public class GruntAI : MonoBehaviour
 
     [Header("Elite Command")]
     [SerializeField] private float commandSearchRadius = 50f;
-    [Tooltip("Lower is more responsive when a leader dies (it also gets notified directly on death).")]
     [SerializeField] private float commandSearchInterval = 0.5f;
     private EliteAI commandingElite;
     private float commandSearchTimer;
@@ -36,12 +35,10 @@ public class GruntAI : MonoBehaviour
     public AiActions CurrentState => currentState;
 
     [Header("Perception")]
-    [FormerlySerializedAs("searchRaidus")]
     [SerializeField] private float sightRange = 20f;
     [SerializeField] private float visionCone = 120f;
     [SerializeField] private float eyeHeight = 1.4f;
     [SerializeField] private float targetHeight = 1.0f;
-    [Tooltip("Layers that block line of sight. Exclude the enemy/player layers if you can.")]
     [SerializeField] private LayerMask lineOfSightMask = ~0;
     [SerializeField] private float memoryDuration = 5f;
     [SerializeField] private float wakeRadius = 15f;
@@ -50,20 +47,15 @@ public class GruntAI : MonoBehaviour
     [SerializeField] private float alertDuration = 1f;
     [SerializeField] private float alertTurnSpeed = 120f;
     [SerializeField] private float combatTurnSpeed = 150f;
-    [Tooltip("Closer than this and the grunt backs off.")]
     [SerializeField] private float minCombatRange = 6f;
-    [Tooltip("Further than this and the grunt advances. Keep below Sight Range.")]
     [SerializeField] private float maxCombatRange = 14f;
-    [Tooltip("Distance the grunt tries to settle at when no firing position is available.")]
     [SerializeField] private float preferredCombatRange = 10f;
     [SerializeField] private float combatRepathInterval = 0.3f;
 
     [Header("Firing Positions")]
-    [Tooltip("How long a grunt holds a firing position before hopping to another.")]
     [SerializeField] private float repositionIntervalMin = 3f;
     [SerializeField] private float repositionIntervalMax = 6f;
     [SerializeField] private int firingPositionCandidates = 8;
-    [Tooltip("Minimum distance between two grunts' claimed firing spots.")]
     [SerializeField] private float firingPositionSeparation = 3f;
 
     [Header("Search")]
@@ -74,15 +66,24 @@ public class GruntAI : MonoBehaviour
 
     [Header("Flee")]
     [SerializeField] private float fleeAreaRadius = 20f;
-    [Tooltip("Minimum time spent fleeing before a returning leader can calm the grunt down.")]
     [SerializeField] private float fleeTime = 5f;
     [SerializeField] private float fleeDestinationTime = 2f;
-    [Tooltip("Chance (0-1), rolled each time the grunt picks a new flee destination, that it snaps and suicide charges instead.")]
     [Range(0f, 1f)]
     [SerializeField] private float suicideChance = 0.1f;
     [SerializeField] private int fleeCandidateCount = 6;
-    [Tooltip("Reject flee/firing routes that pass closer than this to the player.")]
     [SerializeField] private float minPlayerPassDistance = 4f;
+
+    [SerializeField] private float detonationRange = 2.5f;
+    private readonly List<Grenade> carriedGrenades = new List<Grenade>();
+    private EnemyGrenadeThrower grenadeThrower;
+
+    [Header("Grenade Avoidance")]
+    [SerializeField] private float grenadeAvoidMargin = 2f;
+    [SerializeField] private float grenadeCheckInterval = 0.2f;
+    private Grenade threatGrenade;
+    private bool avoidingGrenade;
+    private float grenadeCheckTimer;
+    private float avoidRepathTimer;
 
     private enum SearchPhase { GoToLastKnown, GoToPoint, WaitAtPoint, ReturnHome }
 
@@ -125,7 +126,16 @@ public class GruntAI : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         enemyHealth = GetComponent<EnemyHealth>();
         baseSpeed = agent.speed;
+        grenadeThrower = GetComponent<EnemyGrenadeThrower>();
+        if (enemyHealth != null) enemyHealth.Died += OnDied;
     }
+
+    private void OnDestroy()
+    {
+        if (enemyHealth != null) enemyHealth.Died -= OnDied;
+    }
+
+
 
     private void OnEnable() => allGrunts.Add(this);
 
@@ -208,6 +218,11 @@ public class GruntAI : MonoBehaviour
         agent.speed = baseSpeed;
         
         agent.updateRotation = state != AiActions.Fight;
+        if (state != AiActions.Fight && grenadeThrower != null)
+        {
+            grenadeThrower.CancelThrow();
+        }
+            
 
         if (state != AiActions.Fight)
         {
@@ -299,7 +314,22 @@ public class GruntAI : MonoBehaviour
     {
         fightRepathTimer -= Time.deltaTime;
 
-        if (CanSeePlayer(true))
+        bool canSee = CanSeePlayer(true);
+
+        if (grenadeThrower != null)
+        {
+            if (grenadeThrower.IsThrowing)
+            {
+                agent.isStopped = true;
+                gruntCombat.StopFiring();
+                FaceTowards(grenadeThrower.PendingTarget, combatTurnSpeed);
+                return;
+            }
+
+            grenadeThrower.Evaluate(player, canSee, lastKnownPlayerPosition, lastSeenTime);
+        }
+
+        if (canSee)
         {
             RememberPlayer();
             FaceTowards(player.position, combatTurnSpeed);
@@ -518,7 +548,13 @@ public class GruntAI : MonoBehaviour
 
     private void Charge()
     {
-        
+       
+        if ((player.position - transform.position).sqrMagnitude <= detonationRange * detonationRange)
+        {
+            DetonateCarriedGrenades();
+            return;
+        }
+
         repathTimer -= Time.deltaTime;
         if (repathTimer <= 0f)
         {
@@ -644,9 +680,12 @@ public class GruntAI : MonoBehaviour
             eliteNearby = true;
             hadLeader = true;
         }
+
+        if (UpdateGrenadeAvoidance()) return;
     }
 
   
+
 
     private bool HasArrived() => AINavigation.HasArrived(agent);
 
@@ -710,5 +749,80 @@ public class GruntAI : MonoBehaviour
         }
 
         grenade.Initialise(plasmaGrenadeData);
+        grenade.PrepareAsCarried();
+        carriedGrenades.Add(grenade);
+    }
+
+    private void DetonateCarriedGrenades()
+    {
+        for (int i = carriedGrenades.Count - 1; i >= 0; i--)
+        {
+            if (carriedGrenades[i] != null)
+                carriedGrenades[i].Detonate();
+        }
+        carriedGrenades.Clear();
+    }
+
+    private void OnDied()
+    {
+        if (currentState == AiActions.Charge)
+            DetonateCarriedGrenades();
+    }
+
+
+    private bool UpdateGrenadeAvoidance()
+    {
+        if (!IsInCombatState())
+        {
+            if (avoidingGrenade) StopAvoidingGrenade();
+            return false;
+        }
+
+        grenadeCheckTimer -= Time.deltaTime;
+        if (grenadeCheckTimer <= 0f)
+        {
+            grenadeCheckTimer = grenadeCheckInterval;
+            threatGrenade = Grenade.FindThreat(transform.position, grenadeAvoidMargin, transform);
+        }
+
+        if (threatGrenade == null)
+        {
+            if (avoidingGrenade) StopAvoidingGrenade();
+            return false;
+        }
+
+        if (!avoidingGrenade)
+        {
+            avoidingGrenade = true;
+            gruntCombat.StopFiring();
+            if (grenadeThrower != null) grenadeThrower.CancelThrow();
+            FiringPositions.Release(this);
+            hasFiringPosition = false;
+            agent.updateRotation = true;
+            avoidRepathTimer = 0f;
+        }
+
+        avoidRepathTimer -= Time.deltaTime;
+        if (avoidRepathTimer <= 0f)
+        {
+            avoidRepathTimer = 0.4f;
+            float runDistance = threatGrenade.ExplosionRadius + grenadeAvoidMargin + 2f;
+
+            if (AINavigation.TryPickPointAwayFrom(
+                    transform.position, threatGrenade.transform.position,
+                    runDistance, 6, 1.5f, out Vector3 destination))
+            {
+                agent.isStopped = false;
+                agent.SetDestination(destination);
+            }
+        }
+        return true;
+    }
+
+    private void StopAvoidingGrenade()
+    {
+        avoidingGrenade = false;
+        threatGrenade = null;
+        agent.updateRotation = currentState != AiActions.Fight;
     }
 }

@@ -49,7 +49,66 @@ public static class AINavigation
         return false;
     }
 
-    
+    public static bool IsHiddenFrom(
+    Vector3 position, float eyeHeight, Transform threat, float threatHeight,
+    LayerMask mask, Transform ignoreRoot)
+    {
+        Vector3 eye = position + Vector3.up * eyeHeight;
+        Vector3 target = threat.position + Vector3.up * threatHeight;
+
+        if (Physics.Linecast(eye, target, out RaycastHit hit, mask, QueryTriggerInteraction.Ignore))
+        {
+            Transform root = hit.transform.root;
+            return root != threat.root && (ignoreRoot == null || root != ignoreRoot.root);
+        }
+        return false;
+    }
+
+    public static bool TryPickCover(
+    Vector3 origin, Transform threat, float searchRadius, int candidates,
+    float eyeHeight, float threatHeight, LayerMask mask, Transform ignoreRoot,
+    float minPassDistance, float minThreatDistance, out Vector3 result)
+    {
+        result = Vector3.zero;
+        if (scratchPath == null) scratchPath = new NavMeshPath();
+
+        bool found = false;
+        float bestScore = float.NegativeInfinity;
+
+        for (int i = 0; i < candidates; i++)
+        {
+            float angle = Random.Range(0f, 360f);
+            float radius = Random.Range(3f, searchRadius);
+            Vector3 candidate = origin + Quaternion.Euler(0f, angle, 0f) * Vector3.forward * radius;
+
+            if (!NavMesh.SamplePosition(candidate, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+                continue;
+
+            if (Vector3.Distance(hit.position, threat.position) < minThreatDistance)
+                continue;
+
+            if (!IsHiddenFrom(hit.position, eyeHeight, threat, threatHeight, mask, ignoreRoot))
+                continue;
+
+            if (!NavMesh.CalculatePath(origin, hit.position, NavMesh.AllAreas, scratchPath) ||
+                scratchPath.status != NavMeshPathStatus.PathComplete)
+                continue;
+
+            if (PathPassesNear(scratchPath, threat.position, minPassDistance))
+                continue;
+
+            float score = Vector3.Distance(hit.position, threat.position)
+                          - Vector3.Distance(origin, hit.position) * 0.5f;
+            if (score > bestScore)
+            {
+                bestScore = score;
+                result = hit.position;
+                found = true;
+            }
+        }
+        return found;
+    }
+
     public static bool TryPickPointAwayFrom(
         Vector3 origin, Vector3 threat, float distance,
         int candidates, float minPassDistance, out Vector3 result)
